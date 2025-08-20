@@ -1,33 +1,66 @@
-import { createContext, useEffect, useState } from "react";
+import React, { createContext, useState, useEffect } from "react";
+import axios from "axios";
 
-export const AuthContext = createContext();
+const AuthContext = createContext();
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+const AuthProvider = ({ children }) => {
+  const [userInfo, setUserInfo] = useState(null);
 
   useEffect(() => {
-    const existingUser = localStorage.getItem("guestUser");
-
-    if (existingUser) {
-      setUser(JSON.parse(existingUser));
-    } else {
-      // Auto-create guest
-      fetch("http://localhost:5000/api/users/register-guest", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          localStorage.setItem("guestUser", JSON.stringify(data));
-          setUser(data);
-        })
-        .catch((err) => console.error("Guest register failed", err));
-    }
+    const userInfoFromStorage = localStorage.getItem("userInfo")
+      ? JSON.parse(localStorage.getItem("userInfo"))
+      : null;
+    setUserInfo(userInfoFromStorage);
   }, []);
 
+  const login = async (email, password) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
+      const { data } = await axios.post(
+        "/api/users/login",
+        { email, password },
+        config
+      );
+      setUserInfo(data);
+      localStorage.setItem("userInfo", JSON.stringify(data));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const logout = () => {
+    localStorage.removeItem("userInfo");
+    setUserInfo(null);
+  };
+
+  const register = async (name, email, password) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
+      const { data } = await axios.post(
+        "/api/users/register",
+        { name, email, password },
+        config
+      );
+      setUserInfo(data);
+      localStorage.setItem("userInfo", JSON.stringify(data));
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, setUser }}>
+    <AuthContext.Provider value={{ userInfo, login, logout, register }}>
       {children}
     </AuthContext.Provider>
   );
 };
+
+export { AuthProvider, AuthContext };

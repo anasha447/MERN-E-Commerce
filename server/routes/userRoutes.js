@@ -1,30 +1,21 @@
-// routes/userRoutes.js
 import express from "express";
 import {
+  loginUser,
   registerUser,
-  registerGuest,
   logoutUser,
+  getUserProfile,
+  updateUserProfile,
 } from "../controllers/userController.js";
-import User from "../models/userModel.js"; // ✅ Needed for /admin/users
 import { protect } from "../middleware/authMiddleware.js";
 
 const router = express.Router();
 
-// ✅ Guest Registration
-router.post("/register-guest", registerGuest);
-
-// ✅ User Registration
 router.post("/register", registerUser);
-
-// ✅ Logout
+router.post("/login", loginUser);
 router.post("/logout", logoutUser);
-
-// ✅ Protected Route Example (User Profile)
-router.get("/profile", protect, (req, res) => {
-  res.json(req.user);
-});
-
-// ✅ Admin Only Route Example
-
+router
+  .route("/profile")
+  .get(protect, getUserProfile)
+  .put(protect, updateUserProfile);
 
 export default router;
