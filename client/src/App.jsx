@@ -17,6 +17,9 @@ import OrderHistoryPage from "./pages/OrderHistoryPage";
 import UserListPage from "./pages/admin/UserListPage";
 import UserEditPage from "./pages/admin/UserEditPage";
 import OrderListPage from "./pages/admin/OrderListPage";
+import DashboardPage from "./pages/admin/DashboardPage";
+import ProductListPage from "./pages/admin/ProductListPage";
+import ProductEditPage from "./pages/admin/ProductEditPage";
 import GuestPopup from "./components/guestpopup";
 
 // Components
@@ -48,9 +51,15 @@ function App() {
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/order/:id" element={<OrderPage />} />
               <Route path="/myorders" element={<OrderHistoryPage />} />
+              <Route path="/admin/dashboard" element={<DashboardPage />} />
               <Route path="/admin/users" element={<UserListPage />} />
               <Route path="/admin/user/:id/edit" element={<UserEditPage />} />
               <Route path="/admin/orders" element={<OrderListPage />} />
+              <Route path="/admin/products" element={<ProductListPage />} />
+              <Route
+                path="/admin/product/:id/edit"
+                element={<ProductEditPage />}
+              />
             </Routes>
           </main>
           <AppFooter />

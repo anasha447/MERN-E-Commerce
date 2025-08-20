@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
+import md5 from "md5";
 
 const ProfilePage = () => {
   const { userInfo, setUserInfo } = useContext(AuthContext);
@@ -8,6 +9,11 @@ const ProfilePage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  const getGravatarURL = (email) => {
+    const hash = md5(email.trim().toLowerCase());
+    return `https://www.gravatar.com/avatar/${hash}?d=identicon&s=150`;
+  };
 
   useEffect(() => {
     if (userInfo) {
@@ -42,13 +48,17 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="flex justify-center items-center h-screen">
-      <div className="w-full max-w-md">
-        <form
-          onSubmit={submitHandler}
-          className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
-        >
-          <h1 className="text-2xl font-bold mb-6">User Profile</h1>
+    <div className="flex justify-center items-center h-screen bg-gray-100">
+      <div className="w-full max-w-lg bg-white shadow-lg rounded-lg p-8">
+        <div className="flex flex-col items-center mb-8">
+          <img
+            src={getGravatarURL(userInfo.email)}
+            alt={userInfo.name}
+            className="w-32 h-32 rounded-full mb-4 border-4 border-gray-200"
+          />
+          <h1 className="text-3xl font-bold text-gray-800">{userInfo.name}</h1>
+        </div>
+        <form onSubmit={submitHandler}>
           <div className="mb-4">
             <label
               className="block text-gray-700 text-sm font-bold mb-2"
@@ -113,12 +123,12 @@ const ProfilePage = () => {
               onChange={(e) => setConfirmPassword(e.target.value)}
             />
           </div>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-center">
             <button
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-6 rounded focus:outline-none focus:shadow-outline"
               type="submit"
             >
-              Update
+              Update Profile
             </button>
           </div>
         </form>
