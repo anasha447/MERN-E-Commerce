@@ -4,6 +4,8 @@ import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 
+const API_URL = "http://localhost:5000/api";
+
 const CheckoutPage = () => {
   const { items, subtotal, clearCart } = useCart();
   const { userInfo } = useContext(AuthContext);
@@ -51,7 +53,11 @@ const CheckoutPage = () => {
           Authorization: `Bearer ${userInfo.token}`,
         },
       };
-      const { data } = await axios.post("/api/orders", orderData, config);
+      const { data } = await axios.post(
+        `${API_URL}/orders`,
+        orderData,
+        config
+      );
       clearCart();
       navigate(`/order/${data._id}`);
     } catch (error) {

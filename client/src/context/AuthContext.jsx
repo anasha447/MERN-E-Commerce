@@ -3,6 +3,8 @@ import axios from "axios";
 
 const AuthContext = createContext();
 
+const API_URL = "http://localhost:5000/api";
+
 const AuthProvider = ({ children }) => {
   const [userInfo, setUserInfo] = useState(null);
 
@@ -21,7 +23,7 @@ const AuthProvider = ({ children }) => {
         },
       };
       const { data } = await axios.post(
-        "/api/users/login",
+        `${API_URL}/users/login`,
         { email, password },
         config
       );
@@ -45,7 +47,7 @@ const AuthProvider = ({ children }) => {
         },
       };
       const { data } = await axios.post(
-        "/api/users/register",
+        `${API_URL}/users/register`,
         { name, email, password },
         config
       );

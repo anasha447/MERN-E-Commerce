@@ -29,7 +29,7 @@ const FeaturedProducts = () => {
       variant: 'default'
     }, 1);
   };
-  
+
   const goToPrevious = () => {
     const isFirstSlide = currentIndex === 0;
     const newIndex = isFirstSlide ? products.length - 1 : currentIndex - 1;
@@ -41,7 +41,7 @@ const FeaturedProducts = () => {
     const newIndex = isLastSlide ? 0 : currentIndex + 1;
     setCurrentIndex(newIndex);
   };
-  
+
   const getVisibleProducts = () => {
       if (products.length === 0) return [];
       const visible = [];
@@ -79,7 +79,7 @@ const FeaturedProducts = () => {
               >
                 <div
                   className="relative overflow-hidden cursor-pointer group"
-                  onClick={() => navigate(`/products/${product._id}`)}
+                  onClick={() => navigate(`/product/${product._id}`)}
                 >
                   <img
                     src={product.image}
@@ -92,7 +92,7 @@ const FeaturedProducts = () => {
                 </div>
                 <div
                   className="p-6 flex flex-col items-center text-center cursor-pointer"
-                  onClick={() => navigate(`/products/${product._id}`)}
+                  onClick={() => navigate(`/product/${product._id}`)}
                 >
                   <h3 className="text-xl font-semibold">{product.name}</h3>
                   <p className="[color:var(--color-green)] font-bold">₹{product.price}</p>
@@ -112,7 +112,7 @@ const FeaturedProducts = () => {
               &gt;
             </button>
           </div>
-          
+
           {/* Dots */}
           <div className="flex justify-center mt-8">
             {products.map((_, index) => (

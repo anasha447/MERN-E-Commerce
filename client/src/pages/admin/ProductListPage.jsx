@@ -1,11 +1,12 @@
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 
 const ProductListPage = () => {
   const { userInfo } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -48,8 +49,7 @@ const ProductListPage = () => {
           },
         };
         const { data } = await axios.post("/api/products", {}, config);
-        // TODO: Redirect to edit page for the new product
-        console.log(data);
+        navigate(`/admin/product/${data._id}/edit`);
       } catch (error) {
         console.error(error);
       }
