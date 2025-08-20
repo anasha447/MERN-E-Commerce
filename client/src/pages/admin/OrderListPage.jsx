@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
+import { FaEye } from "react-icons/fa";
 
 const OrderListPage = () => {
   const { userInfo } = useContext(AuthContext);
@@ -49,94 +50,64 @@ const OrderListPage = () => {
   };
 
   return (
-    <div className="container mx-auto py-12">
-      <h1 className="text-3xl font-bold mb-8">Orders</h1>
+    <div className="container mx-auto py-12 px-4 md:px-12 bg-[var(--color-white)]">
+      <h1 className="text-4xl font-bold text-center mb-12 text-[var(--color-darkgreen)] font-heading">
+        Order Management
+      </h1>
       {loading ? (
         <div>Loading...</div>
       ) : (
-        <div className="bg-white shadow-md rounded-lg">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+        <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+          <table className="min-w-full">
+            <thead className="bg-[var(--color-darkgreen)] text-[var(--color-craemy)]">
               <tr>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  ID
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  User
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Date
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Total
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Paid
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font--medium text-gray-500 uppercase tracking-wider"
-                >
-                  Delivered
-                </th>
-                <th scope="col" className="relative px-6 py-3">
-                  <span className="sr-only">Details</span>
-                </th>
+                <th className="py-3 px-6 text-left font-heading">ID</th>
+                <th className="py-3 px-6 text-left font-heading">User</th>
+                <th className="py-3 px-6 text-left font-heading">Date</th>
+                <th className="py-3 px-6 text-left font-heading">Total</th>
+                <th className="py-3 px-6 text-left font-heading">Paid</th>
+                <th className="py-3 px-6 text-left font-heading">Delivered</th>
+                <th className="py-3 px-6 text-left font-heading">Actions</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="divide-y divide-gray-200">
               {orders.map((order) => (
-                <tr key={order._id}>
-                  <td className="px-6 py-4 whitespace-nowrap">{order._id}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {order.user && order.user.name}
+                <tr key={order._id} className="hover:bg-gray-50">
+                  <td className="py-4 px-6">{order._id}</td>
+                  <td className="py-4 px-6">
+                    {order.user ? order.user.name : "N/A"}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {order.createdAt.substring(0, 10)}
+                  <td className="py-4 px-6">
+                    {new Date(order.createdAt).toLocaleDateString()}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    ${order.totalPrice}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="py-4 px-6">${order.totalPrice.toFixed(2)}</td>
+                  <td className="py-4 px-6">
                     {order.isPaid ? (
-                      order.paidAt.substring(0, 10)
+                      <span className="text-green-500 font-bold">Paid</span>
                     ) : (
-                      <span className="text-red-500">No</span>
+                      <span className="text-red-500 font-bold">Not Paid</span>
                     )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="py-4 px-6">
                     {order.isDelivered ? (
-                      order.deliveredAt.substring(0, 10)
+                      <span className="text-green-500 font-bold">
+                        Delivered
+                      </span>
                     ) : (
                       <button
                         onClick={() => deliverHandler(order._id)}
-                        className="text-green-600 hover:text-green-900"
+                        className="bg-[var(--color-orange)] text-white py-1 px-3 rounded-full text-sm hover:opacity-90"
                       >
                         Mark as Delivered
                       </button>
                     )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <td className="py-4 px-6">
                     <Link
                       to={`/order/${order._id}`}
-                      className="text-indigo-600 hover:text-indigo-900"
+                      className="text-[var(--color-green)] hover:text-[var(--color-lightgreen)]"
                     >
-                      Details
+                      <FaEye size={20} />
                     </Link>
                   </td>
                 </tr>

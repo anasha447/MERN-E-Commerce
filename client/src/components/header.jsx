@@ -1,6 +1,8 @@
 import React, { useState, useEffect, useContext } from "react";
 import { MdShoppingCart } from "react-icons/md";
+import { FaUserCircle } from "react-icons/fa";
 import { Link, NavLink } from "react-router-dom";
+import md5 from "md5";
 import logo from "../assets/logo.png";
 import { useCart } from "../context/cart-context";
 import { AuthContext } from "../context/AuthContext";
@@ -9,6 +11,11 @@ const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const { itemCount } = useCart();
   const { userInfo, logout } = useContext(AuthContext);
+
+  const getGravatarURL = (email) => {
+    const hash = md5(email.trim().toLowerCase());
+    return `https://www.gravatar.com/avatar/${hash}?d=identicon`;
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -74,10 +81,16 @@ const Header = () => {
             </Link>
             {userInfo && userInfo.isAdmin && (
               <div className="relative group">
-                <button className="text-[#E9DDAF] hover:text-[#E85D1F] transition-colors">
+                <button className="text-[#E9DDAF] hover:text-[#E85D1F] transition-colors font-bold">
                   Admin
                 </button>
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 hidden group-hover:block">
+                  <Link
+                    to="/admin/dashboard"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    Dashboard
+                  </Link>
                   <Link
                     to="/admin/users"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -90,15 +103,28 @@ const Header = () => {
                   >
                     Orders
                   </Link>
+                  <Link
+                    to="/admin/products"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    Products
+                  </Link>
                 </div>
               </div>
             )}
             {userInfo ? (
               <div className="relative group">
                 <button className="text-[#E9DDAF] hover:text-[#E85D1F] transition-colors">
-                  {userInfo.name}
+                  <img
+                    src={getGravatarURL(userInfo.email)}
+                    alt={userInfo.name}
+                    className="w-8 h-8 rounded-full"
+                  />
                 </button>
                 <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 hidden group-hover:block">
+                  <div className="px-4 py-2 text-sm text-gray-700 border-b">
+                    Signed in as <strong>{userInfo.name}</strong>
+                  </div>
                   <Link
                     to="/profile"
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -120,12 +146,25 @@ const Header = () => {
                 </div>
               </div>
             ) : (
-              <Link
-                to="/login"
-                className="text-[#E9DDAF] hover:text-[#E85D1F] transition-colors font-bold"
-              >
-                Sign In
-              </Link>
+              <div className="relative group">
+                <button className="text-[#E9DDAF] hover:text-[#E85D1F] transition-colors">
+                  <FaUserCircle size={26} />
+                </button>
+                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 hidden group-hover:block">
+                  <Link
+                    to="/login"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    Login
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                  >
+                    Register
+                  </Link>
+                </div>
+              </div>
             )}
           </div>
         </div>

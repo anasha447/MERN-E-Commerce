@@ -1,6 +1,42 @@
 import User from "../models/userModel.js";
 import Order from "../models/orderModel.js";
 
+const getDashboardStats = async (req, res) => {
+  try {
+    const totalSales = await Order.aggregate([
+      {
+        $group: {
+          _id: null,
+          totalSales: { $sum: "$totalPrice" },
+        },
+      },
+    ]);
+
+    const totalOrders = await Order.countDocuments({});
+
+    const totalUsers = await User.countDocuments({});
+
+    const salesData = await Order.aggregate([
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+          totalSales: { $sum: "$totalPrice" },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+
+    res.json({
+      totalSales: totalSales.length > 0 ? totalSales[0].totalSales : 0,
+      totalOrders,
+      totalUsers,
+      salesData,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 const getUsers = async (req, res) => {
   const users = await User.find({});
   res.json(users);
@@ -61,6 +97,7 @@ const updateOrderToDelivered = async (req, res) => {
 };
 
 export {
+  getDashboardStats,
   getUsers,
   getUserById,
   updateUser,

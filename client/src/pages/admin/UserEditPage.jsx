@@ -58,68 +58,70 @@ const UserEditPage = () => {
   };
 
   return (
-    <div className="container mx-auto py-12">
-      <Link to="/admin/users" className="text-blue-500 hover:underline">
-        Go Back
+    <div className="container mx-auto py-12 px-4 md:px-12 bg-[var(--color-white)]">
+      <Link
+        to="/admin/users"
+        className="text-[var(--color-orange)] hover:underline font-bold mb-8 inline-block"
+      >
+        &larr; Go Back
       </Link>
-      <h1 className="text-3xl font-bold my-8">Edit User</h1>
+      <h1 className="text-4xl font-bold text-center mb-12 text-[var(--color-darkgreen)] font-heading">
+        Edit User
+      </h1>
       {loading ? (
         <div>Loading...</div>
       ) : (
-        <div className="w-full max-w-lg">
-          <form
-            onSubmit={submitHandler}
-            className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4"
-          >
-            <div className="mb-4">
+        <div className="w-full max-w-lg mx-auto bg-white shadow-lg rounded-lg p-8">
+          <form onSubmit={submitHandler}>
+            <div className="mb-6">
               <label
-                className="block text-gray-700 text-sm font-bold mb-2"
+                className="block text-[var(--color-darkgreen)] text-lg font-bold mb-2 font-heading"
                 htmlFor="name"
               >
                 Name
               </label>
               <input
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                className="shadow-sm appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 id="name"
                 type="text"
-                placeholder="Name"
+                placeholder="Enter name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
             </div>
-            <div className="mb-4">
+            <div className="mb-6">
               <label
-                className="block text-gray-700 text-sm font-bold mb-2"
+                className="block text-[var(--color-darkgreen)] text-lg font-bold mb-2 font-heading"
                 htmlFor="email"
               >
                 Email
               </label>
               <input
-                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                className="shadow-sm appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                 id="email"
                 type="email"
-                placeholder="Email"
+                placeholder="Enter email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
-            <div className="mb-6">
+            <div className="mb-8">
               <label className="flex items-center">
                 <input
                   type="checkbox"
-                  className="form-checkbox"
+                  className="form-checkbox h-5 w-5 text-[var(--color-green)]"
                   checked={isAdmin}
                   onChange={(e) => setIsAdmin(e.target.checked)}
                 />
-                <span className="ml-2 text-gray-700">Is Admin</span>
+                <span className="ml-3 text-lg text-gray-700">Is Admin</span>
               </label>
             </div>
-            <div className="flex items-center justify-between">
+            <div className="flex items-center justify-center">
               <button
-                className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                className="bg-[var(--color-green)] hover:bg-[var(--color-lightgreen)] text-white font-bold py-3 px-8 rounded-full focus:outline-none focus:shadow-outline text-lg"
                 type="submit"
               >
-                Update
+                Update User
               </button>
             </div>
           </form>

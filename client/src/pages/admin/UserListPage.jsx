@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
+import { FaEdit, FaTrash } from "react-icons/fa";
 
 const UserListPage = () => {
   const { userInfo } = useContext(AuthContext);
@@ -48,69 +49,49 @@ const UserListPage = () => {
   };
 
   return (
-    <div className="container mx-auto py-12">
-      <h1 className="text-3xl font-bold mb-8">Users</h1>
+    <div className="container mx-auto py-12 px-4 md:px-12 bg-[var(--color-white)]">
+      <h1 className="text-4xl font-bold text-center mb-12 text-[var(--color-darkgreen)] font-heading">
+        User Management
+      </h1>
       {loading ? (
         <div>Loading...</div>
       ) : (
-        <div className="bg-white shadow-md rounded-lg">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+        <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+          <table className="min-w-full">
+            <thead className="bg-[var(--color-darkgreen)] text-[var(--color-craemy)]">
               <tr>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  ID
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Name
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Email
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Admin
-                </th>
-                <th scope="col" className="relative px-6 py-3">
-                  <span className="sr-only">Edit</span>
-                </th>
+                <th className="py-3 px-6 text-left font-heading">ID</th>
+                <th className="py-3 px-6 text-left font-heading">Name</th>
+                <th className="py-3 px-6 text-left font-heading">Email</th>
+                <th className="py-3 px-6 text-left font-heading">Admin</th>
+                <th className="py-3 px-6 text-left font-heading">Actions</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="divide-y divide-gray-200">
               {users.map((user) => (
-                <tr key={user._id}>
-                  <td className="px-6 py-4 whitespace-nowrap">{user._id}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{user.name}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">{user.email}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                <tr key={user._id} className="hover:bg-gray-50">
+                  <td className="py-4 px-6">{user._id}</td>
+                  <td className="py-4 px-6">{user.name}</td>
+                  <td className="py-4 px-6">{user.email}</td>
+                  <td className="py-4 px-6">
                     {user.isAdmin ? (
-                      <span className="text-green-500">Yes</span>
+                      <span className="text-green-500 font-bold">Yes</span>
                     ) : (
-                      <span className="text-red-500">No</span>
+                      <span className="text-red-500 font-bold">No</span>
                     )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <td className="py-4 px-6 flex items-center gap-4">
                     <Link
                       to={`/admin/user/${user._id}/edit`}
-                      className="text-indigo-600 hover:text-indigo-900"
+                      className="text-[var(--color-green)] hover:text-[var(--color-lightgreen)]"
                     >
-                      Edit
+                      <FaEdit size={20} />
                     </Link>
                     <button
                       onClick={() => deleteHandler(user._id)}
-                      className="text-red-600 hover:text-red-900 ml-4"
+                      className="text-[var(--color-orange)] hover:text-red-700"
                     >
-                      Delete
+                      <FaTrash size={20} />
                     </button>
                   </td>
                 </tr>
