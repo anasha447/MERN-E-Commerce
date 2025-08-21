@@ -1,23 +1,45 @@
 import React, { useState, useContext, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import { AuthContext } from "../../context/AuthContext";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const { login, userInfo } = useContext(AuthContext);
+  const { userInfo, setUserInfo } = useContext(AuthContext);
   const navigate = useNavigate();
-
-  const submitHandler = (e) => {
-    e.preventDefault();
-    login(email, password);
-  };
 
   useEffect(() => {
     if (userInfo) {
-      navigate("/");
+      navigate("/profile");
     }
   }, [userInfo, navigate]);
+  
+  const submitHandler = async (e) => {
+    e.preventDefault();
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
+      const { data } = await axios.post(
+        "http://localhost:5000/api/users/login",
+        { email, password },
+        config
+      );
+      alert("Login successful!");
+      setUserInfo(data);
+      localStorage.setItem("userInfo", JSON.stringify(data));
+      navigate("/profile");
+    } catch (error) {
+      const message =
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message;
+      alert(`Error: ${message}`);
+    }
+  };
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-[var(--color-craemy)]">
@@ -40,6 +62,7 @@ const LoginPage = () => {
               placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
             />
           </div>
           <div className="mb-8">
@@ -56,6 +79,7 @@ const LoginPage = () => {
               placeholder="******************"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
             />
           </div>
           <div className="flex items-center justify-center mb-6">

@@ -1,5 +1,6 @@
 import React, { useState, useContext, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import { AuthContext } from "../../context/AuthContext";
 
 const RegisterPage = () => {
@@ -7,24 +8,44 @@ const RegisterPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const { register, userInfo } = useContext(AuthContext);
+  const { userInfo, setUserInfo } = useContext(AuthContext);
   const navigate = useNavigate();
-
-  const submitHandler = (e) => {
-    e.preventDefault();
-    if (password !== confirmPassword) {
-      // TODO: Add proper error handling
-      console.error("Passwords do not match");
-    } else {
-      register(name, email, password);
-    }
-  };
 
   useEffect(() => {
     if (userInfo) {
-      navigate("/");
+      navigate("/profile");
     }
   }, [userInfo, navigate]);
+
+  const submitHandler = async (e) => {
+    e.preventDefault();
+    if (password !== confirmPassword) {
+      alert("Passwords do not match");
+      return;
+    }
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+        },
+      };
+      const { data } = await axios.post(
+        "http://localhost:5000/api/users/register",
+        { name, email, password },
+        config
+      );
+      alert("Registration successful!");
+      setUserInfo(data);
+      localStorage.setItem("userInfo", JSON.stringify(data));
+      navigate("/profile");
+    } catch (error) {
+      const message =
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message;
+      alert(`Error: ${message}`);
+    }
+  };
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-[var(--color-craemy)]">
@@ -47,6 +68,7 @@ const RegisterPage = () => {
               placeholder="Your Name"
               value={name}
               onChange={(e) => setName(e.target.value)}
+              required
             />
           </div>
           <div className="mb-6">
@@ -63,6 +85,7 @@ const RegisterPage = () => {
               placeholder="you@example.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
+              required
             />
           </div>
           <div className="mb-6">
@@ -79,6 +102,7 @@ const RegisterPage = () => {
               placeholder="******************"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
             />
           </div>
           <div className="mb-8">
@@ -95,6 +119,7 @@ const RegisterPage = () => {
               placeholder="******************"
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
+              required
             />
           </div>
           <div className="flex items-center justify-center mb-6">
