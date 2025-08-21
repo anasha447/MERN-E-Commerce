@@ -11,7 +11,11 @@ const LoginPage = () => {
 
   useEffect(() => {
     if (userInfo) {
-      navigate("/profile");
+      if (userInfo.isAdmin) {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/profile");
+      }
     }
   }, [userInfo, navigate]);
 
@@ -30,7 +34,11 @@ const LoginPage = () => {
       );
       setUserInfo(data);
       localStorage.setItem("userInfo", JSON.stringify(data));
-      navigate("/profile");
+      if (data.isAdmin) {
+        navigate("/admin/dashboard");
+      } else {
+        navigate("/profile");
+      }
     } catch (error) {
       const message =
         error.response && error.response.data.message

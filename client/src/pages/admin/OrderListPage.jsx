@@ -71,47 +71,48 @@ const OrderListPage = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {orders.map((order) => (
-                <tr key={order._id} className="hover:bg-gray-50">
-                  <td className="py-4 px-6">{order._id}</td>
-                  <td className="py-4 px-6">
-                    {order.user ? order.user.name : "N/A"}
-                  </td>
-                  <td className="py-4 px-6">
-                    {new Date(order.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="py-4 px-6">${order.totalPrice.toFixed(2)}</td>
-                  <td className="py-4 px-6">
-                    {order.isPaid ? (
-                      <span className="text-green-500 font-bold">Paid</span>
-                    ) : (
-                      <span className="text-red-500 font-bold">Not Paid</span>
-                    )}
-                  </td>
-                  <td className="py-4 px-6">
-                    {order.isDelivered ? (
-                      <span className="text-green-500 font-bold">
-                        Delivered
-                      </span>
-                    ) : (
-                      <button
-                        onClick={() => deliverHandler(order._id)}
-                        className="bg-[var(--color-orange)] text-white py-1 px-3 rounded-full text-sm hover:opacity-90"
+              {Array.isArray(orders) &&
+                orders.map((order) => (
+                  <tr key={order._id} className="hover:bg-gray-50">
+                    <td className="py-4 px-6">{order._id}</td>
+                    <td className="py-4 px-6">
+                      {order.user ? order.user.name : "N/A"}
+                    </td>
+                    <td className="py-4 px-6">
+                      {new Date(order.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="py-4 px-6">${order.totalPrice.toFixed(2)}</td>
+                    <td className="py-4 px-6">
+                      {order.isPaid ? (
+                        <span className="text-green-500 font-bold">Paid</span>
+                      ) : (
+                        <span className="text-red-500 font-bold">Not Paid</span>
+                      )}
+                    </td>
+                    <td className="py-4 px-6">
+                      {order.isDelivered ? (
+                        <span className="text-green-500 font-bold">
+                          Delivered
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() => deliverHandler(order._id)}
+                          className="bg-[var(--color-orange)] text-white py-1 px-3 rounded-full text-sm hover:opacity-90"
+                        >
+                          Mark as Delivered
+                        </button>
+                      )}
+                    </td>
+                    <td className="py-4 px-6">
+                      <Link
+                        to={`/order/${order._id}`}
+                        className="text-[var(--color-green)] hover:text-[var(--color-lightgreen)]"
                       >
-                        Mark as Delivered
-                      </button>
-                    )}
-                  </td>
-                  <td className="py-4 px-6">
-                    <Link
-                      to={`/order/${order._id}`}
-                      className="text-[var(--color-green)] hover:text-[var(--color-lightgreen)]"
-                    >
-                      <FaEye size={20} />
-                    </Link>
-                  </td>
-                </tr>
-              ))}
+                        <FaEye size={20} />
+                      </Link>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>

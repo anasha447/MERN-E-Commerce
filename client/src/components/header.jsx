@@ -110,7 +110,8 @@ const Header = () => {
                 </span>
               )}
             </Link>
-            {userInfo && userInfo.isAdmin && (
+
+            {userInfo && userInfo.isAdmin ? (
               <div
                 className="relative"
                 onMouseEnter={handleAdminMenuEnter}
@@ -145,68 +146,75 @@ const Header = () => {
                     >
                       Products
                     </Link>
-                  </div>
-                )}
-              </div>
-            )}
-            <div
-              className="relative"
-              onMouseEnter={handleUserMenuEnter}
-              onMouseLeave={handleUserMenuLeave}
-            >
-              <button className="text-[#E9DDAF] hover:text-[#E85D1F] transition-colors">
-                {userInfo ? (
-                  <img
-                    src={getGravatarURL(userInfo.email)}
-                    alt={userInfo.name}
-                    className="w-8 h-8 rounded-full"
-                  />
-                ) : (
-                  <FaUserCircle size={26} />
-                )}
-              </button>
-              {isUserMenuOpen &&
-                (userInfo ? (
-                  <div className="absolute right-0 mt-2 w-48 bg-[var(--color-craemy)] rounded-md shadow-lg py-1 z-50">
-                    <div className="px-4 py-2 text-sm text-white border-b border-white/20">
-                      Signed in as <strong>{userInfo.name}</strong>
-                    </div>
-                    <Link
-                      to="/profile"
-                      className="block px-4 py-2 text-sm text-white hover:bg-[var(--color-lightgreen)]"
-                    >
-                      Profile
-                    </Link>
-                    <Link
-                      to="/myorders"
-                      className="block px-4 py-2 text-sm text-white hover:bg-[var(--color-lightgreen)]"
-                    >
-                      My Orders
-                    </Link>
-                    <button
+                     <button
                       onClick={logout}
                       className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-[var(--color-lightgreen)]"
                     >
                       Logout
                     </button>
                   </div>
-                ) : (
-                  <div className="absolute right-0 mt-2 w-48 bg-[var(--color-craemy)] rounded-md shadow-lg py-1 z-50">
-                    <Link
-                      to="/login"
-                      className="block px-4 py-2 text-sm text-white hover:bg-[var(--color-lightgreen)]"
-                    >
-                      Login
-                    </Link>
-                    <Link
-                      to="/register"
-                      className="block px-4 py-2 text-sm text-white hover:bg-[var(--color-lightgreen)]"
-                    >
-                      Register
-                    </Link>
-                  </div>
-                ))}
-            </div>
+                )}
+              </div>
+            ) : (
+              <div
+                className="relative"
+                onMouseEnter={handleUserMenuEnter}
+                onMouseLeave={handleUserMenuLeave}
+              >
+                <button className="text-[#E9DDAF] hover:text-[#E85D1F] transition-colors">
+                  {userInfo ? (
+                    <img
+                      src={getGravatarURL(userInfo.email)}
+                      alt={userInfo.name}
+                      className="w-8 h-8 rounded-full"
+                    />
+                  ) : (
+                    <FaUserCircle size={26} />
+                  )}
+                </button>
+                {isUserMenuOpen &&
+                  (userInfo ? (
+                    <div className="absolute right-0 mt-2 w-48 bg-[var(--color-craemy)] rounded-md shadow-lg py-1 z-50">
+                      <div className="px-4 py-2 text-sm text-white border-b border-white/20">
+                        Signed in as <strong>{userInfo.name}</strong>
+                      </div>
+                      <Link
+                        to="/profile"
+                        className="block px-4 py-2 text-sm text-white hover:bg-[var(--color-lightgreen)]"
+                      >
+                        Profile
+                      </Link>
+                      <Link
+                        to="/myorders"
+                        className="block px-4 py-2 text-sm text-white hover:bg-[var(--color-lightgreen)]"
+                      >
+                        My Orders
+                      </Link>
+                      <button
+                        onClick={logout}
+                        className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-[var(--color-lightgreen)]"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="absolute right-0 mt-2 w-48 bg-[var(--color-craemy)] rounded-md shadow-lg py-1 z-50">
+                      <Link
+                        to="/login"
+                        className="block px-4 py-2 text-sm text-white hover:bg-[var(--color-lightgreen)]"
+                      >
+                        Login
+                      </Link>
+                      <Link
+                        to="/register"
+                        className="block px-4 py-2 text-sm text-white hover:bg-[var(--color-lightgreen)]"
+                      >
+                        Register
+                      </Link>
+                    </div>
+                  ))}
+              </div>
+            )}
           </div>
         </div>
       </div>

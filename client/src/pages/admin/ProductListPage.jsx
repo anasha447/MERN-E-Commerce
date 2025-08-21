@@ -85,29 +85,30 @@ const ProductListPage = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {products.map((product) => (
-                <tr key={product._id} className="hover:bg-gray-50">
-                  <td className="py-4 px-6">{product._id}</td>
-                  <td className="py-4 px-6">{product.name}</td>
-                  <td className="py-4 px-6">${product.price.toFixed(2)}</td>
-                  <td className="py-4 px-6">{product.category}</td>
-                  <td className="py-4 px-6">{product.brand}</td>
-                  <td className="py-4 px-6 flex items-center gap-4">
-                    <Link
-                      to={`/admin/product/${product._id}/edit`}
-                      className="text-[var(--color-green)] hover:text-[var(--color-lightgreen)]"
-                    >
-                      <FaEdit size={20} />
-                    </Link>
-                    <button
-                      onClick={() => deleteHandler(product._id)}
-                      className="text-[var(--color-orange)] hover:text-red-700"
-                    >
-                      <FaTrash size={20} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {Array.isArray(products) &&
+                products.map((product) => (
+                  <tr key={product._id} className="hover:bg-gray-50">
+                    <td className="py-4 px-6">{product._id}</td>
+                    <td className="py-4 px-6">{product.name}</td>
+                    <td className="py-4 px-6">${product.price.toFixed(2)}</td>
+                    <td className="py-4 px-6">{product.category}</td>
+                    <td className="py-4 px-6">{product.brand}</td>
+                    <td className="py-4 px-6 flex items-center gap-4">
+                      <Link
+                        to={`/admin/product/${product._id}/edit`}
+                        className="text-[var(--color-green)] hover:text-[var(--color-lightgreen)]"
+                      >
+                        <FaEdit size={20} />
+                      </Link>
+                      <button
+                        onClick={() => deleteHandler(product._id)}
+                        className="text-[var(--color-orange)] hover:text-red-700"
+                      >
+                        <FaTrash size={20} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>
