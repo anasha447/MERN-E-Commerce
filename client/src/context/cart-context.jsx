@@ -5,6 +5,7 @@ import React, {
   useMemo,
   useReducer,
   useRef,
+  useState,
 } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
@@ -75,6 +76,7 @@ const CartContext = createContext(null);
 
 export function CartProvider({ children }) {
   const [state, dispatch] = useReducer(cartReducer, undefined, initCart);
+  const [isCartOpen, setIsCartOpen] = useState(false);
   const authCtx = useContext(AuthContext);
   const isInitialMount = useRef(true);
 
@@ -146,7 +148,13 @@ export function CartProvider({ children }) {
     }
   };
 
-  const addToCart = (product, qty = 1) => dispatch({ type: "ADD", payload: { product, qty } });
+  const openCart = () => setIsCartOpen(true);
+  const closeCart = () => setIsCartOpen(false);
+
+  const addToCart = (product, qty = 1) => {
+    dispatch({ type: "ADD", payload: { product, qty } });
+    openCart();
+  };
   const setQty = (key, qty) => dispatch({ type: "SET_QTY", payload: { key, qty } });
   const removeFromCart = (key) => dispatch({ type: "REMOVE", payload: { key } });
   const clearCart = () => dispatch({ type: "CLEAR" });
@@ -155,6 +163,9 @@ export function CartProvider({ children }) {
     items: state.items,
     itemCount,
     subtotal,
+    isCartOpen,
+    openCart,
+    closeCart,
     addToCart,
     setQty,
     removeFromCart,

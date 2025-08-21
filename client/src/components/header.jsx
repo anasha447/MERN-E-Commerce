@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { MdShoppingCart } from "react-icons/md";
 import { FaUserCircle } from "react-icons/fa";
 import { Link, NavLink } from "react-router-dom";
@@ -11,10 +11,10 @@ const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false);
-  let userMenuTimeout;
-  let adminMenuTimeout;
+  const userMenuTimeout = useRef(null);
+  const adminMenuTimeout = useRef(null);
 
-  const { itemCount, clearCart } = useCart();
+  const { itemCount, clearCart, openCart } = useCart();
   const { userInfo, logout: authLogout } = useContext(AuthContext);
 
   const handleLogout = () => {
@@ -29,23 +29,23 @@ const Header = () => {
   };
 
   const handleUserMenuEnter = () => {
-    clearTimeout(userMenuTimeout);
+    clearTimeout(userMenuTimeout.current);
     setIsUserMenuOpen(true);
   };
 
   const handleUserMenuLeave = () => {
-    userMenuTimeout = setTimeout(() => {
+    userMenuTimeout.current = setTimeout(() => {
       setIsUserMenuOpen(false);
     }, 1000);
   };
 
   const handleAdminMenuEnter = () => {
-    clearTimeout(adminMenuTimeout);
+    clearTimeout(adminMenuTimeout.current);
     setIsAdminMenuOpen(true);
   };
 
   const handleAdminMenuLeave = () => {
-    adminMenuTimeout = setTimeout(() => {
+    adminMenuTimeout.current = setTimeout(() => {
       setIsAdminMenuOpen(false);
     }, 1000);
   };
@@ -57,8 +57,8 @@ const Header = () => {
     window.addEventListener("scroll", handleScroll);
     return () => {
       window.removeEventListener("scroll", handleScroll);
-      clearTimeout(userMenuTimeout);
-      clearTimeout(adminMenuTimeout);
+      clearTimeout(userMenuTimeout.current);
+      clearTimeout(adminMenuTimeout.current);
     };
   }, []);
 
@@ -105,7 +105,11 @@ const Header = () => {
           </div>
 
           <div className="justify-self-end flex items-center gap-4">
-            <Link to="/cart" aria-label="Cart" className="relative">
+            <button
+              onClick={openCart}
+              aria-label="Cart"
+              className="relative"
+            >
               <MdShoppingCart
                 size={26}
                 className="text-[#E9DDAF] hover:text-[#E85D1F] transition-colors duration-300"
@@ -115,7 +119,7 @@ const Header = () => {
                   {itemCount}
                 </span>
               )}
-            </Link>
+            </button>
 
             {userInfo && userInfo.isAdmin ? (
               <div

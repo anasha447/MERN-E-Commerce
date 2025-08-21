@@ -1,9 +1,7 @@
 import React from "react";
-import { motion } from "framer-motion";
-import { useInView } from "react-intersection-observer";
 import OurStoryBanner from "../components/banner-ourstory";
 import Matecup from "../assets/matecup.jpg";
-import Logo from "../assets/logo.png";
+import StorySection from "../components/ourstory/StorySection";
 
 const sections = [
   {
