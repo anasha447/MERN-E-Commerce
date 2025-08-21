@@ -2,6 +2,13 @@ import Order from "../models/orderModel.js";
 import User from "../models/userModel.js";
 import sendEmail from "../utils/sendEmail.js";
 import orderConfirmationEmail from "../utils/emailTemplates/orderConfirmationEmail.js";
+import crypto from "crypto";
+
+const generateTrackingId = () => {
+  const timestamp = Date.now();
+  const randomPart = crypto.randomBytes(2).toString("hex").toUpperCase();
+  return `MAT${timestamp}${randomPart}`;
+};
 
 const addOrderItems = async (req, res) => {
   const {
@@ -25,8 +32,9 @@ const addOrderItems = async (req, res) => {
   } else {
     const { email, name } = shippingAddress;
     if (!email) {
-      res.status(400).json({ message: "Email is required for guest checkout" });
-      return;
+      return res
+        .status(400)
+        .json({ message: "Email is required for guest checkout" });
     }
     let guestUser = await User.findOne({ email, isGuest: true });
     if (!guestUser) {
@@ -40,11 +48,23 @@ const addOrderItems = async (req, res) => {
     userForOrder = guestUser;
   }
 
+  const trackingId = generateTrackingId();
+  let orderStatus = "Pending";
+  let isPaid = false;
+
+  if (paymentMethod === "COD") {
+    orderStatus = "Confirmed";
+    isPaid = false;
+  }
+
   const order = new Order({
     orderItems,
     user: userForOrder._id,
+    trackingId,
     shippingAddress,
     paymentMethod,
+    status: orderStatus,
+    isPaid: isPaid,
     itemsPrice,
     taxPrice,
     shippingPrice,
@@ -56,7 +76,7 @@ const addOrderItems = async (req, res) => {
   try {
     await sendEmail({
       email: shippingAddress.email,
-      subject: `Your MaTeesa Order Confirmation [${createdOrder._id}]`,
+      subject: `Your MaTeesa Order Confirmation [${createdOrder.trackingId}]`,
       html: orderConfirmationEmail(createdOrder),
     });
   } catch (error) {
@@ -81,7 +101,10 @@ const getOrderById = async (req, res) => {
 
 const trackOrder = async (req, res) => {
   const { orderId, email } = req.body;
-  const order = await Order.findById(orderId).populate("user", "email");
+  const order = await Order.findOne({ trackingId: orderId }).populate(
+    "user",
+    "email"
+  );
 
   if (order && order.user.email === email) {
     res.json(order);
@@ -96,6 +119,7 @@ const updateOrderToPaid = async (req, res) => {
   if (order) {
     order.isPaid = true;
     order.paidAt = Date.now();
+    order.status = "Paid";
     order.paymentResult = {
       id: req.body.id,
       status: req.body.status,
@@ -115,4 +139,10 @@ const getMyOrders = async (req, res) => {
   res.json(orders);
 };
 
-export { addOrderItems, getOrderById, updateOrderToPaid, getMyOrders, trackOrder };
+export {
+  addOrderItems,
+  getOrderById,
+  updateOrderToPaid,
+  getMyOrders,
+  trackOrder,
+};

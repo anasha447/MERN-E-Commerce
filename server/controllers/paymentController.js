@@ -2,15 +2,10 @@ import Razorpay from "razorpay";
 import crypto from "crypto";
 import Order from "../models/orderModel.js";
 
-let instance = null;
-
-// ✅ Only init Razorpay if keys exist
-if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
-  instance = new Razorpay({
-    key_id: process.env.RAZORPAY_KEY_ID,
-    key_secret: process.env.RAZORPAY_KEY_SECRET,
-  });
-}
+const instance = new Razorpay({
+  key_id: process.env.RAZORPAY_KEY_ID,
+  key_secret: process.env.RAZORPAY_KEY_SECRET,
+});
 
 const createRazorpayOrder = async (req, res) => {
   const { orderId } = req.body;
@@ -20,27 +15,8 @@ const createRazorpayOrder = async (req, res) => {
     return res.status(404).json({ message: "Order not found" });
   }
 
-  // ✅ Fallback for dev mode without Razorpay
-  if (!instance) {
-    order.isPaid = true;
-    order.paidAt = Date.now();
-    order.paymentResult = {
-      id: "DEV_PAYMENT_ID",
-      status: "succeeded",
-      update_time: new Date().toISOString(),
-      email_address: order.shippingAddress?.email || "dev@mateesa.com",
-    };
-    await order.save();
-
-    return res.json({
-      message: "Payment simulated (dev mode, Razorpay not configured)",
-      orderId: order._id,
-    });
-  }
-
-  // 🔹 Real Razorpay flow
   const options = {
-    amount: order.totalPrice * 100, // amount in paise
+    amount: order.totalPrice * 100, // amount in the smallest currency unit
     currency: "INR",
     receipt: order._id.toString(),
   };
@@ -53,6 +29,7 @@ const createRazorpayOrder = async (req, res) => {
         .json({ message: "Something went wrong with Razorpay" });
     }
 
+    // Save the razorpay_order_id to our order document
     order.paymentResult = { razorpay_order_id: razorpayOrder.id };
     await order.save();
 
@@ -67,14 +44,8 @@ const verifyRazorpayPayment = async (req, res) => {
   const { razorpay_order_id, razorpay_payment_id, razorpay_signature } =
     req.body;
 
-  if (!instance) {
-    return res.status(200).json({
-      message: "Payment auto-verified in dev mode",
-      dev: true,
-    });
-  }
-
   const body = razorpay_order_id + "|" + razorpay_payment_id;
+
   const expectedSignature = crypto
     .createHmac("sha256", process.env.RAZORPAY_KEY_SECRET)
     .update(body.toString())

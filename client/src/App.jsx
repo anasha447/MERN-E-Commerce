@@ -18,6 +18,7 @@ import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import ProfilePage from "./pages/ProfilePage";
 import OrderPage from "./pages/OrderPage";
 import OrderHistoryPage from "./pages/OrderHistoryPage";
+import OrderConfirmationPage from "./pages/OrderConfirmationPage";
 import TrackOrderPage from "./pages/TrackOrderPage";
 import UserListPage from "./pages/admin/UserListPage";
 import UserEditPage from "./pages/admin/UserEditPage";
@@ -73,6 +74,10 @@ function App() {
               />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/order/:id" element={<OrderPage />} />
+              <Route
+                path="/order-confirmation/:id"
+                element={<OrderConfirmationPage />}
+              />
               <Route path="/myorders" element={<OrderHistoryPage />} />
               <Route path="/admin/dashboard" element={<DashboardPage />} />
               <Route path="/admin/users" element={<UserListPage />} />
