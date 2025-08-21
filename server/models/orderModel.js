@@ -31,10 +31,11 @@ const orderSchema = new mongoose.Schema(
       required: true,
     },
     paymentResult: {
-      id: { type: String },
+      id: { type: String }, // payment_id from provider
       status: { type: String },
       update_time: { type: String },
       email_address: { type: String },
+      razorpay_order_id: { type: String }, // order_id from provider
     },
     itemsPrice: {
       type: Number,

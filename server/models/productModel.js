@@ -1,5 +1,12 @@
 import mongoose from "mongoose";
 
+const variantSchema = new mongoose.Schema({
+  name: { type: String, required: true }, // e.g., "250g", "500g", "Red", "Blue"
+  price: { type: Number, required: true },
+  stock: { type: Number, required: true, default: 0 },
+  sku: { type: String },
+});
+
 const productSchema = mongoose.Schema(
   {
     name: { type: String, required: true },
@@ -10,17 +17,12 @@ const productSchema = mongoose.Schema(
       type: String,
       required: true,
     },
+    // The 'price' and 'countInStock' fields at the top level can be used as a default
+    // or as a base price if no variants exist.
     price: { type: Number, required: true, default: 0 },
     countInStock: { type: Number, required: true, default: 0 },
     isFeatured: { type: Boolean, default: false },
-
-    // ✅ NEW FIELD (only used for Mate)
-    weights: [
-      {
-        label: { type: String }, // "250g", "500g", "1kg"
-        price: { type: Number }, // optional: custom price per weight
-      },
-    ],
+    variants: [variantSchema],
   },
   { timestamps: true }
 );
