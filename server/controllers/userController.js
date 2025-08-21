@@ -84,10 +84,32 @@ const updateUserProfile = async (req, res) => {
   }
 };
 
+const getCart = async (req, res) => {
+  const user = await User.findById(req.user._id);
+  if (user) {
+    res.json(user.cart);
+  } else {
+    res.status(404).json({ message: "User not found" });
+  }
+};
+
+const updateCart = async (req, res) => {
+  const user = await User.findById(req.user._id);
+  if (user) {
+    user.cart = req.body.cart;
+    const updatedUser = await user.save();
+    res.json(updatedUser.cart);
+  } else {
+    res.status(404).json({ message: "User not found" });
+  }
+};
+
 export {
   loginUser,
   registerUser,
   logoutUser,
   getUserProfile,
   updateUserProfile,
+  getCart,
+  updateCart,
 };

@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { useCart } from "../context/cart-context";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
@@ -12,11 +12,24 @@ const CheckoutPage = () => {
   const navigate = useNavigate();
   const [paymentMethod, setPaymentMethod] = useState("online");
   const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    phone: "",
     address: "",
     city: "",
     postalCode: "",
     country: "India",
   });
+
+  useEffect(() => {
+    if (userInfo) {
+      setFormData((prev) => ({
+        ...prev,
+        name: userInfo.name,
+        email: userInfo.email,
+      }));
+    }
+  }, [userInfo]);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -66,9 +79,9 @@ const CheckoutPage = () => {
   };
 
   return (
-    <div className="min-h-screen py-12 px-4 md:px-12 [background-color:var(--color-white)]">
+    <div className="min-h-screen py-12 px-4 md:px-12 bg-[var(--color-white)]">
       <div className="container mx-auto">
-        <h1 className="text-4xl font-bold text-center mb-12 [color:var(--color-darkgreen)]">
+        <h1 className="text-4xl font-bold text-center mb-12 text-[var(--color-darkgreen)]">
           Checkout
         </h1>
         <form
@@ -80,6 +93,45 @@ const CheckoutPage = () => {
               Shipping Information
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div>
+                <label htmlFor="name" className="block text-gray-700 mb-2">
+                  Full Name
+                </label>
+                <input
+                  type="text"
+                  name="name"
+                  value={formData.name}
+                  onChange={handleInputChange}
+                  className="w-full p-3 border rounded-md"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="email" className="block text-gray-700 mb-2">
+                  Email
+                </label>
+                <input
+                  type="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleInputChange}
+                  className="w-full p-3 border rounded-md"
+                  required
+                />
+              </div>
+              <div>
+                <label htmlFor="phone" className="block text-gray-700 mb-2">
+                  Phone Number
+                </label>
+                <input
+                  type="tel"
+                  name="phone"
+                  value={formData.phone}
+                  onChange={handleInputChange}
+                  className="w-full p-3 border rounded-md"
+                  required
+                />
+              </div>
               <div>
                 <label htmlFor="address" className="block text-gray-700 mb-2">
                   Address
@@ -145,7 +197,10 @@ const CheckoutPage = () => {
             <div className="space-y-4">
               {items.length > 0 ? (
                 items.map((item) => (
-                  <div key={item.key} className="flex justify-between items-center">
+                  <div
+                    key={item.key}
+                    className="flex justify-between items-center"
+                  >
                     <div>
                       <p className="font-semibold">{item.name}</p>
                       <p className="text-sm text-gray-600">{item.variant}</p>

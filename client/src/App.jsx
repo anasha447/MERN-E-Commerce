@@ -20,6 +20,7 @@ import OrderListPage from "./pages/admin/OrderListPage";
 import DashboardPage from "./pages/admin/DashboardPage";
 import ProductListPage from "./pages/admin/ProductListPage";
 import ProductEditPage from "./pages/admin/ProductEditPage";
+import ProductCreatePage from "./pages/admin/ProductCreatePage";
 import GuestPopup from "./components/guestpopup";
 
 // Components
@@ -56,6 +57,10 @@ function App() {
               <Route path="/admin/user/:id/edit" element={<UserEditPage />} />
               <Route path="/admin/orders" element={<OrderListPage />} />
               <Route path="/admin/products" element={<ProductListPage />} />
+              <Route
+                path="/admin/product/create"
+                element={<ProductCreatePage />}
+              />
               <Route
                 path="/admin/product/:id/edit"
                 element={<ProductEditPage />}

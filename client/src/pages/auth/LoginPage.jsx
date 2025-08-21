@@ -2,11 +2,15 @@ import React, { useState, useContext, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { AuthContext } from "../../context/AuthContext";
+import { useCart } from "../../context/cart-context";
+
+const API_URL = "http://localhost:5000/api";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const { userInfo, setUserInfo } = useContext(AuthContext);
+  const { mergeCarts, clearCart } = useCart();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -27,16 +31,21 @@ const LoginPage = () => {
           "Content-Type": "application/json",
         },
       };
-      const { data } = await axios.post(
-        "http://localhost:5000/api/users/login",
+      const { data: userData } = await axios.post(
+        `${API_URL}/users/login`,
         { email, password },
         config
       );
-      setUserInfo(data);
-      localStorage.setItem("userInfo", JSON.stringify(data));
-      if (data.isAdmin) {
+
+      setUserInfo(userData);
+      localStorage.setItem("userInfo", JSON.stringify(userData));
+
+      if (userData.isAdmin) {
+        clearCart();
+        alert("Admin login successful. Cart has been cleared.");
         navigate("/admin/dashboard");
       } else {
+        await mergeCarts(userData.token);
         navigate("/profile");
       }
     } catch (error) {

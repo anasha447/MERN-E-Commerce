@@ -42,34 +42,18 @@ const ProductListPage = () => {
     }
   };
 
-  const createProductHandler = async () => {
-    if (window.confirm("Are you sure you want to create a new product?")) {
-      try {
-        const config = {
-          headers: {
-            Authorization: `Bearer ${userInfo.token}`,
-          },
-        };
-        const { data } = await axios.post(`${API_URL}/products`, {}, config);
-        navigate(`/admin/product/${data._id}/edit`);
-      } catch (error) {
-        console.error(error);
-      }
-    }
-  };
-
   return (
     <div className="container mx-auto py-12 px-4 md:px-12 bg-[var(--color-white)]">
       <div className="flex justify-between items-center mb-12">
         <h1 className="text-4xl font-bold text-[var(--color-darkgreen)] font-heading">
           Product Management
         </h1>
-        <button
-          onClick={createProductHandler}
+        <Link
+          to="/admin/product/create"
           className="bg-[var(--color-orange)] text-white py-2 px-4 rounded-full flex items-center gap-2 hover:opacity-90"
         >
           <FaPlus /> Create Product
-        </button>
+        </Link>
       </div>
       {loading ? (
         <div>Loading...</div>
