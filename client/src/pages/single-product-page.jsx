@@ -37,16 +37,21 @@ const SingleProductPage = () => {
     return <p className="text-center text-red-500">Product not found</p>;
   }
 
-  const handleBuyNow = () => {
+  const handleAddToCart = () => {
     addToCart(
       {
         id: product._id,
         name: product.name,
         price: product.price,
+        image: product.image,
         variant: selectedWeight,
       },
       1
     );
+  };
+
+  const handleBuyNow = () => {
+    handleAddToCart();
     navigate("/checkoutpage");
   };
 
@@ -94,17 +99,7 @@ const SingleProductPage = () => {
         {/* Action Buttons */}
         <div className="mt-8 flex items-center space-x-4">
           <button
-            onClick={() =>
-              addToCart(
-                {
-                  id: product._id,
-                  name: product.name,
-                  price: product.price,
-                  variant: selectedWeight,
-                },
-                1
-              )
-            }
+            onClick={handleAddToCart}
             className="text-white px-6 py-3 rounded-md font-semibold transition duration-300 [background-color:var(--color-lightgreen)] hover:[background-color:var(--color-darkgreen)]"
           >
             Add to Cart

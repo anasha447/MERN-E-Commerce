@@ -1,5 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 // Pages
 import Home from "./pages/home";
@@ -11,6 +13,8 @@ import SingleProductPage from "./pages/single-product-page";
 import CheckoutPage from "./pages/checkoutpage";
 import LoginPage from "./pages/auth/LoginPage";
 import RegisterPage from "./pages/auth/RegisterPage";
+import ForgotPasswordPage from "./pages/auth/ForgotPasswordPage";
+import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import ProfilePage from "./pages/ProfilePage";
 import OrderPage from "./pages/OrderPage";
 import OrderHistoryPage from "./pages/OrderHistoryPage";
@@ -36,6 +40,17 @@ function App() {
     <AuthProvider>
       <CartProvider>
         <Router>
+          <ToastContainer
+            position="top-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+          />
           <Header />
           <GuestPopup />
           <main className="min-h-screen bg-white">
@@ -49,6 +64,11 @@ function App() {
               <Route path="/checkoutpage" element={<CheckoutPage />} />
               <Route path="/login" element={<LoginPage />} />
               <Route path="/register" element={<RegisterPage />} />
+              <Route path="/forgotpassword" element={<ForgotPasswordPage />} />
+              <Route
+                path="/resetpassword/:token"
+                element={<ResetPasswordPage />}
+              />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/order/:id" element={<OrderPage />} />
               <Route path="/myorders" element={<OrderHistoryPage />} />

@@ -7,6 +7,8 @@ import {
   updateUserProfile,
   getCart,
   updateCart,
+  forgotPassword,
+  resetPassword,
 } from "../controllers/userController.js";
 import { protect } from "../middleware/authMiddleware.js";
 
@@ -15,6 +17,9 @@ const router = express.Router();
 router.post("/register", registerUser);
 router.post("/login", loginUser);
 router.post("/logout", logoutUser);
+router.post("/forgotpassword", forgotPassword);
+router.put("/resetpassword/:token", resetPassword);
+
 router
   .route("/profile")
   .get(protect, getUserProfile)

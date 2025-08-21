@@ -7,6 +7,7 @@ import React, {
   useRef,
 } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 import { AuthContext } from "./AuthContext";
 
 const API_URL = "http://localhost:5000/api";
@@ -20,6 +21,7 @@ function cartReducer(state, action) {
       return { ...state, items: action.payload.items };
     case "ADD": {
       const { product, qty } = action.payload;
+      toast.success(`✅ ${product.name} added to cart!`);
       const key = keyFrom(product);
       const existing = state.items.find((item) => item.key === key);
       let updatedItems;
@@ -30,7 +32,7 @@ function cartReducer(state, action) {
       } else {
         updatedItems = [...state.items, { key, ...product, qty }];
       }
-      return { ...state, items: updatedItems, alert: `✅ ${product.name} added to cart!` };
+      return { ...state, items: updatedItems };
     }
     case "SET_QTY": {
       const { key, qty } = action.payload;
@@ -42,15 +44,14 @@ function cartReducer(state, action) {
       };
     }
     case "REMOVE":
+      toast.error("❌ Item removed from cart.");
       return {
         ...state,
         items: state.items.filter((item) => item.key !== action.payload.key),
-        alert: "❌ Item removed from cart.",
       };
     case "CLEAR":
-      return { ...state, items: [], alert: "🛒 Cart cleared." };
-    case "CLEAR_ALERT":
-      return { ...state, alert: null };
+      toast.info("🛒 Cart cleared.");
+      return { ...state, items: [] };
     default:
       return state;
   }
@@ -59,9 +60,9 @@ function cartReducer(state, action) {
 function initCart() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : { items: [], alert: null };
+    return raw ? JSON.parse(raw) : { items: [] };
   } catch {
-    return { items: [], alert: null };
+    return { items: [] };
   }
 }
 
@@ -69,21 +70,15 @@ const CartContext = createContext(null);
 
 export function CartProvider({ children }) {
   const [state, dispatch] = useReducer(cartReducer, undefined, initCart);
-  const authCtx = useContext(AuthContext); // Get the whole context
+  const authCtx = useContext(AuthContext);
   const isInitialMount = useRef(true);
 
-  // Persist cart to localStorage for GUEST users only
-  // Or sync to DB for LOGGED-IN users
   useEffect(() => {
-    // Skip the very first render to avoid overwriting DB cart with initial guest cart
     if (isInitialMount.current) {
       isInitialMount.current = false;
       return;
     }
-
-    // Now we can safely access userInfo
     const userInfo = authCtx ? authCtx.userInfo : null;
-
     const syncCart = async () => {
       if (userInfo && !userInfo.isAdmin) {
         try {
@@ -96,17 +91,8 @@ export function CartProvider({ children }) {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
       }
     };
-
     syncCart();
   }, [state.items, authCtx]);
-
-  // Auto-clear alert
-  useEffect(() => {
-    if (state.alert) {
-      const timer = setTimeout(() => dispatch({ type: "CLEAR_ALERT" }), 1500);
-      return () => clearTimeout(timer);
-    }
-  }, [state.alert]);
 
   const { itemCount, subtotal } = useMemo(() => {
     const itemCount = state.items.reduce((total, item) => total + item.qty, 0);
@@ -118,36 +104,31 @@ export function CartProvider({ children }) {
     try {
       const guestCartRaw = localStorage.getItem(STORAGE_KEY);
       const guestCart = guestCartRaw ? JSON.parse(guestCartRaw).items : [];
+      if (guestCart.length === 0) return;
 
       const config = { headers: { Authorization: `Bearer ${token}` } };
       const { data: dbCart } = await axios.get(`${API_URL}/users/cart`, config);
 
       const mergedCartMap = new Map();
-
       dbCart.forEach(item => mergedCartMap.set(item.key, item));
-
-      let itemsMerged = false;
       guestCart.forEach(guestItem => {
         if (mergedCartMap.has(guestItem.key)) {
           mergedCartMap.get(guestItem.key).qty += guestItem.qty;
         } else {
           mergedCartMap.set(guestItem.key, guestItem);
         }
-        itemsMerged = true;
       });
-
       const mergedCart = Array.from(mergedCartMap.values());
 
       await axios.post(`${API_URL}/users/cart`, { cart: mergedCart }, config);
       dispatch({ type: "SET_CART", payload: { items: mergedCart } });
 
-      if (itemsMerged && guestCart.length > 0) {
-        alert("Your guest cart items have been merged with your account cart.");
-      }
+      toast.info("Your guest cart items have been merged with your account cart.");
       localStorage.removeItem(STORAGE_KEY);
 
     } catch (error) {
       console.error("Failed to merge carts:", error);
+      toast.error("Could not merge carts.");
     }
   };
 
@@ -160,7 +141,6 @@ export function CartProvider({ children }) {
     items: state.items,
     itemCount,
     subtotal,
-    alert: state.alert,
     addToCart,
     setQty,
     removeFromCart,

@@ -1,52 +1,42 @@
-import React, { useState, useContext, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 import axios from "axios";
-import { toast } from "react-toastify";
-import { AuthContext } from "../../context/AuthContext";
+import { useParams, useNavigate } from "react-router-dom";
 
 const API_URL = "http://localhost:5000/api";
 
-const RegisterPage = () => {
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
+const ResetPasswordPage = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const { userInfo, setUserInfo } = useContext(AuthContext);
+  const [message, setMessage] = useState("");
+  const { token } = useParams();
   const navigate = useNavigate();
-
-  useEffect(() => {
-    if (userInfo) {
-      navigate("/profile");
-    }
-  }, [userInfo, navigate]);
 
   const submitHandler = async (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      toast.error("Passwords do not match");
+      setMessage("Passwords do not match");
       return;
     }
+    setMessage("");
     try {
       const config = {
         headers: {
           "Content-Type": "application/json",
         },
       };
-      const { data } = await axios.post(
-        `${API_URL}/users/register`,
-        { name, email, password },
+      await axios.put(
+        `${API_URL}/users/resetpassword/${token}`,
+        { password },
         config
       );
-      toast.success("Registration successful! Welcome.");
-      setUserInfo(data);
-      localStorage.setItem("userInfo", JSON.stringify(data));
-      navigate("/profile");
+      setMessage("Password has been reset successfully. You can now log in.");
+      setTimeout(() => navigate("/login"), 3000);
     } catch (error) {
-      const message =
+      const errorMsg =
         error.response && error.response.data.message
           ? error.response.data.message
           : error.message;
-      toast.error(message);
+      setMessage(`Error: ${errorMsg}`);
     }
   };
 
@@ -54,49 +44,15 @@ const RegisterPage = () => {
     <div className="flex justify-center items-center min-h-screen bg-[var(--color-craemy)]">
       <div className="w-full max-w-md bg-white shadow-2xl rounded-2xl p-10">
         <h1 className="text-4xl font-bold mb-8 text-center text-[var(--color-darkgreen)] font-heading">
-          Create Account
+          Reset Password
         </h1>
         <form onSubmit={submitHandler}>
           <div className="mb-6">
             <label
               className="block text-[var(--color-darkgreen)] text-lg font-bold mb-2 font-heading"
-              htmlFor="name"
-            >
-              Name
-            </label>
-            <input
-              className="shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="name"
-              type="text"
-              placeholder="Your Name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              required
-            />
-          </div>
-          <div className="mb-6">
-            <label
-              className="block text-[var(--color-darkgreen)] text-lg font-bold mb-2 font-heading"
-              htmlFor="email"
-            >
-              Email
-            </label>
-            <input
-              className="shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="email"
-              type="email"
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-            />
-          </div>
-          <div className="mb-6">
-            <label
-              className="block text-[var(--color-darkgreen)] text-lg font-bold mb-2 font-heading"
               htmlFor="password"
             >
-              Password
+              New Password
             </label>
             <input
               className="shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -113,7 +69,7 @@ const RegisterPage = () => {
               className="block text-[var(--color-darkgreen)] text-lg font-bold mb-2 font-heading"
               htmlFor="confirmPassword"
             >
-              Confirm Password
+              Confirm New Password
             </label>
             <input
               className="shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -130,21 +86,14 @@ const RegisterPage = () => {
               className="bg-[var(--color-orange)] hover:opacity-90 text-white font-bold py-3 px-8 rounded-full focus:outline-none focus:shadow-outline text-lg"
               type="submit"
             >
-              Register
+              Reset Password
             </button>
           </div>
-          <div className="text-center">
-            <Link
-              className="inline-block align-baseline font-bold text-lg text-[var(--color-green)] hover:text-[var(--color-lightgreen)]"
-              to="/login"
-            >
-              Already have an account? Login
-            </Link>
-          </div>
         </form>
+        {message && <p className="text-center mt-4">{message}</p>}
       </div>
     </div>
   );
 };
 
-export default RegisterPage;
+export default ResetPasswordPage;

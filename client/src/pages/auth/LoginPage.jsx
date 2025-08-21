@@ -1,6 +1,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { toast } from "react-toastify";
 import { AuthContext } from "../../context/AuthContext";
 import { useCart } from "../../context/cart-context";
 
@@ -37,12 +38,13 @@ const LoginPage = () => {
         config
       );
 
+      toast.success("Login successful!");
       setUserInfo(userData);
       localStorage.setItem("userInfo", JSON.stringify(userData));
 
       if (userData.isAdmin) {
         clearCart();
-        alert("Admin login successful. Cart has been cleared.");
+        toast.info("Admin login successful. Cart has been cleared.");
         navigate("/admin/dashboard");
       } else {
         await mergeCarts(userData.token);
@@ -53,7 +55,7 @@ const LoginPage = () => {
         error.response && error.response.data.message
           ? error.response.data.message
           : error.message;
-      alert(`Error: ${message}`);
+      toast.error(message);
     }
   };
 
@@ -81,7 +83,7 @@ const LoginPage = () => {
               required
             />
           </div>
-          <div className="mb-8">
+          <div className="mb-4">
             <label
               className="block text-[var(--color-darkgreen)] text-lg font-bold mb-2 font-heading"
               htmlFor="password"
@@ -97,6 +99,14 @@ const LoginPage = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
+          </div>
+          <div className="text-right mb-8">
+            <Link
+              to="/forgotpassword"
+              className="font-bold text-sm text-[var(--color-green)] hover:text-[var(--color-lightgreen)]"
+            >
+              Forgot Password?
+            </Link>
           </div>
           <div className="flex items-center justify-center mb-6">
             <button

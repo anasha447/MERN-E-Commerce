@@ -25,8 +25,13 @@ const CheckoutPage = () => {
     if (userInfo) {
       setFormData((prev) => ({
         ...prev,
-        name: userInfo.name,
-        email: userInfo.email,
+        name: userInfo.name || "",
+        email: userInfo.email || "",
+        phone: userInfo.phone || "",
+        address: userInfo.address?.street || "",
+        city: userInfo.address?.city || "",
+        postalCode: userInfo.address?.postalCode || "",
+        country: userInfo.address?.country || "India",
       }));
     }
   }, [userInfo]);
@@ -63,18 +68,33 @@ const CheckoutPage = () => {
       const config = {
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${userInfo.token}`,
         },
       };
+
+      if (userInfo) {
+          config.headers.Authorization = `Bearer ${userInfo.token}`;
+      }
+
       const { data } = await axios.post(
         `${API_URL}/orders`,
         orderData,
         config
       );
+
       clearCart();
-      navigate(`/order/${data._id}`);
+
+      // For guests, we might want to show a simple confirmation
+      // For logged-in users, we redirect to their order page
+      if(userInfo) {
+        navigate(`/order/${data._id}`);
+      } else {
+        alert(`Your order has been placed! Your order ID is ${data._id}`);
+        navigate("/");
+      }
+
     } catch (error) {
       console.error(error);
+      alert("There was an error placing your order.");
     }
   };
 

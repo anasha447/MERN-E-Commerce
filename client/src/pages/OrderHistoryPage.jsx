@@ -3,6 +3,8 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
+const API_URL = "http://localhost:5000/api";
+
 const OrderHistoryPage = () => {
   const { userInfo } = useContext(AuthContext);
   const [orders, setOrders] = useState([]);
@@ -10,13 +12,17 @@ const OrderHistoryPage = () => {
 
   useEffect(() => {
     const fetchOrders = async () => {
+      if (!userInfo) {
+        setLoading(false);
+        return;
+      }
       try {
         const config = {
           headers: {
             Authorization: `Bearer ${userInfo.token}`,
           },
         };
-        const { data } = await axios.get("/api/orders/myorders", config);
+        const { data } = await axios.get(`${API_URL}/orders/myorders`, config);
         setOrders(data);
         setLoading(false);
       } catch (error) {
@@ -24,9 +30,7 @@ const OrderHistoryPage = () => {
         setLoading(false);
       }
     };
-    if (userInfo) {
-      fetchOrders();
-    }
+    fetchOrders();
   }, [userInfo]);
 
   return (
@@ -34,7 +38,7 @@ const OrderHistoryPage = () => {
       <h1 className="text-3xl font-bold mb-8">My Orders</h1>
       {loading ? (
         <div>Loading...</div>
-      ) : orders.length === 0 ? (
+      ) : !Array.isArray(orders) || orders.length === 0 ? (
         <div>You have no orders.</div>
       ) : (
         <div className="bg-white shadow-md rounded-lg">
