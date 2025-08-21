@@ -72,6 +72,7 @@ const Header = () => {
                 { name: "Shop", path: "/shop" },
                 { name: "What is mate?!", path: "/what.is.mate" },
                 { name: "Our Story", path: "/our_story" },
+                { name: "Track Order", path: "/track-order" },
               ].map((item) => (
                 <li key={item.path}>
                   <NavLink

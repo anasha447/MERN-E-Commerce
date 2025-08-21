@@ -18,6 +18,7 @@ import ResetPasswordPage from "./pages/auth/ResetPasswordPage";
 import ProfilePage from "./pages/ProfilePage";
 import OrderPage from "./pages/OrderPage";
 import OrderHistoryPage from "./pages/OrderHistoryPage";
+import TrackOrderPage from "./pages/TrackOrderPage";
 import UserListPage from "./pages/admin/UserListPage";
 import UserEditPage from "./pages/admin/UserEditPage";
 import OrderListPage from "./pages/admin/OrderListPage";
@@ -60,6 +61,7 @@ function App() {
               <Route path="/what.is.mate" element={<ConsumptionMap />} />
               <Route path="/our_story" element={<StoryPage />} />
               <Route path="/cart" element={<Cart />} />
+              <Route path="/track-order" element={<TrackOrderPage />} />
               <Route path="/product/:id" element={<SingleProductPage />} />
               <Route path="/checkoutpage" element={<CheckoutPage />} />
               <Route path="/login" element={<LoginPage />} />

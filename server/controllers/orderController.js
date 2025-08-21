@@ -79,6 +79,17 @@ const getOrderById = async (req, res) => {
   }
 };
 
+const trackOrder = async (req, res) => {
+  const { orderId, email } = req.body;
+  const order = await Order.findById(orderId).populate("user", "email");
+
+  if (order && order.user.email === email) {
+    res.json(order);
+  } else {
+    res.status(404).json({ message: "Order not found or email does not match" });
+  }
+};
+
 const updateOrderToPaid = async (req, res) => {
   const order = await Order.findById(req.params.id);
 
@@ -104,4 +115,4 @@ const getMyOrders = async (req, res) => {
   res.json(orders);
 };
 
-export { addOrderItems, getOrderById, updateOrderToPaid, getMyOrders };
+export { addOrderItems, getOrderById, updateOrderToPaid, getMyOrders, trackOrder };

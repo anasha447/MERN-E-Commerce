@@ -3,6 +3,7 @@ import axios from "axios";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { FaEye } from "react-icons/fa";
+import Spinner from "../../components/Spinner";
 
 const API_URL = "http://localhost:5000/api";
 
@@ -30,7 +31,7 @@ const OrderListPage = () => {
     if (userInfo && userInfo.isAdmin) {
       fetchOrders();
     } else {
-      // Redirect to login or show unauthorized message
+      setLoading(false);
     }
   }, [userInfo]);
 
@@ -57,7 +58,7 @@ const OrderListPage = () => {
         Order Management
       </h1>
       {loading ? (
-        <div>Loading...</div>
+        <Spinner />
       ) : (
         <div className="bg-white shadow-lg rounded-lg overflow-hidden">
           <table className="min-w-full">
@@ -69,6 +70,9 @@ const OrderListPage = () => {
                 <th className="py-3 px-6 text-left font-heading">Total</th>
                 <th className="py-3 px-6 text-left font-heading">Paid</th>
                 <th className="py-3 px-6 text-left font-heading">Delivered</th>
+                <th className="py-3 px-6 text-left font-heading">
+                  Payment Method
+                </th>
                 <th className="py-3 px-6 text-left font-heading">Actions</th>
               </tr>
             </thead>
@@ -78,33 +82,34 @@ const OrderListPage = () => {
                   <tr key={order._id} className="hover:bg-gray-50">
                     <td className="py-4 px-6">{order._id}</td>
                     <td className="py-4 px-6">
-                      {order.user ? order.user.name : "N/A"}
+                      {order.user ? order.user.name : "Guest"}
                     </td>
                     <td className="py-4 px-6">
                       {new Date(order.createdAt).toLocaleDateString()}
                     </td>
-                    <td className="py-4 px-6">${order.totalPrice.toFixed(2)}</td>
+                    <td className="py-4 px-6">
+                      ${order.totalPrice.toFixed(2)}
+                    </td>
                     <td className="py-4 px-6">
                       {order.isPaid ? (
                         <span className="text-green-500 font-bold">Paid</span>
                       ) : (
-                        <span className="text-red-500 font-bold">Not Paid</span>
+                        <span className="text-red-500 font-bold">No</span>
                       )}
                     </td>
                     <td className="py-4 px-6">
                       {order.isDelivered ? (
-                        <span className="text-green-500 font-bold">
-                          Delivered
-                        </span>
+                        <span className="text-green-500 font-bold">Yes</span>
                       ) : (
                         <button
                           onClick={() => deliverHandler(order._id)}
                           className="bg-[var(--color-orange)] text-white py-1 px-3 rounded-full text-sm hover:opacity-90"
                         >
-                          Mark as Delivered
+                          Mark Delivered
                         </button>
                       )}
                     </td>
+                    <td className="py-4 px-6">{order.paymentMethod}</td>
                     <td className="py-4 px-6">
                       <Link
                         to={`/order/${order._id}`}
