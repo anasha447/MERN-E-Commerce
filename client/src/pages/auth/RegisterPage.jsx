@@ -34,7 +34,6 @@ const RegisterPage = () => {
         { name, email, password },
         config
       );
-      alert("Registration successful!");
       setUserInfo(data);
       localStorage.setItem("userInfo", JSON.stringify(data));
       navigate("/profile");

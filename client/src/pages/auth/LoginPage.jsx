@@ -14,7 +14,7 @@ const LoginPage = () => {
       navigate("/profile");
     }
   }, [userInfo, navigate]);
-  
+
   const submitHandler = async (e) => {
     e.preventDefault();
     try {
@@ -28,7 +28,6 @@ const LoginPage = () => {
         { email, password },
         config
       );
-      alert("Login successful!");
       setUserInfo(data);
       localStorage.setItem("userInfo", JSON.stringify(data));
       navigate("/profile");
