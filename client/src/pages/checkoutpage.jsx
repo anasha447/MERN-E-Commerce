@@ -131,7 +131,6 @@ const CheckoutPage = () => {
       if (paymentMethod === "online") {
         await handlePayment(newOrder._id);
       } else {
-        // For COD, redirect directly to the confirmation page
         toast.success("Order placed successfully with Cash on Delivery!");
         navigate(`/order-confirmation/${newOrder._id}`);
       }
@@ -160,31 +159,31 @@ const CheckoutPage = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
                 <label htmlFor="name" className="block text-sm font-medium text-gray-700">Full Name</label>
-                <input type="text" name="name" id="name" value={formData.name} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required />
+                <input type="text" name="name" id="name" value={formData.name} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-3" required />
               </div>
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email Address</label>
-                <input type="email" name="email" id="email" value={formData.email} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required />
+                <input type="email" name="email" id="email" value={formData.email} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-3" required />
               </div>
               <div className="md:col-span-2">
                 <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Phone Number</label>
-                <input type="tel" name="phone" id="phone" value={formData.phone} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required />
+                <input type="tel" name="phone" id="phone" value={formData.phone} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-3" required />
               </div>
               <div className="md:col-span-2">
                 <label htmlFor="address" className="block text-sm font-medium text-gray-700">Street Address</label>
-                <input type="text" name="address" id="address" value={formData.address} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required />
+                <input type="text" name="address" id="address" value={formData.address} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-3" required />
               </div>
               <div>
                 <label htmlFor="city" className="block text-sm font-medium text-gray-700">City</label>
-                <input type="text" name="city" id="city" value={formData.city} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required />
+                <input type="text" name="city" id="city" value={formData.city} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-3" required />
               </div>
               <div>
                 <label htmlFor="postalCode" className="block text-sm font-medium text-gray-700">Postal Code</label>
-                <input type="text" name="postalCode" id="postalCode" value={formData.postalCode} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required />
+                <input type="text" name="postalCode" id="postalCode" value={formData.postalCode} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-3" required />
               </div>
               <div className="md:col-span-2">
                  <label htmlFor="country" className="block text-sm font-medium text-gray-700">Country</label>
-                <input type="text" name="country" id="country" value={formData.country} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required />
+                <input type="text" name="country" id="country" value={formData.country} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm py-3" required />
               </div>
             </div>
           </div>
@@ -192,7 +191,6 @@ const CheckoutPage = () => {
             <h2 className="text-2xl font-bold mb-6 [color:var(--color-green)]">
               Order Summary
             </h2>
-            {/* Order summary remains the same */}
             <div className="mt-8">
               <h3 className="text-xl font-bold mb-4 [color:var(--color-green)]">
                 Payment Method
