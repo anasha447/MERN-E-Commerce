@@ -2,6 +2,7 @@ import React, { useState, useContext } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
+import { toast } from "react-toastify";
 
 const API_URL = "http://localhost:5000/api";
 
@@ -38,8 +39,14 @@ const ProductCreatePage = () => {
         },
         config
       );
+      toast.success("Product created successfully!");
       navigate("/admin/products");
     } catch (error) {
+      const message =
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : "There was an error creating the product.";
+      toast.error(message);
       console.error(error);
     }
   };

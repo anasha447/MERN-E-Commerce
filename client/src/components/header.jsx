@@ -18,8 +18,9 @@ const Header = () => {
   const { userInfo, logout } = useContext(AuthContext);
 
   const getGravatarURL = (email) => {
+    if (!email) return "";
     const hash = md5(email.trim().toLowerCase());
-    return `https://www.gravatar.com/avatar/${hash}?d=identicon`;
+    return `https://www.gravatar.com/avatar/${hash}?d=mp`;
   };
 
   const handleUserMenuEnter = () => {
@@ -146,7 +147,7 @@ const Header = () => {
                     >
                       Products
                     </Link>
-                     <button
+                    <button
                       onClick={logout}
                       className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-[var(--color-lightgreen)]"
                     >
@@ -174,25 +175,25 @@ const Header = () => {
                 </button>
                 {isUserMenuOpen &&
                   (userInfo ? (
-                    <div className="absolute right-0 mt-2 w-48 bg-[var(--color-white)] rounded-md shadow-lg py-1 z-50">
-                      <div className="px-4 py-2 text-sm text-black border-b border-black/20">
-                        HELLO <strong>{userInfo.name}</strong>
+                    <div className="absolute right-0 mt-2 w-48 bg-[var(--color-craemy)] rounded-md shadow-lg py-1 z-50">
+                      <div className="px-4 py-2 text-sm text-white border-b border-white/20">
+                        Signed in as <strong>{userInfo.name}</strong>
                       </div>
                       <Link
                         to="/profile"
-                        className="block px-4 py-2 text-sm text-black hover:bg-[var(--color-lightgreen)]"
+                        className="block px-4 py-2 text-sm text-white hover:bg-[var(--color-lightgreen)]"
                       >
                         Profile
                       </Link>
                       <Link
                         to="/myorders"
-                        className="block px-4 py-2 text-sm text-black hover:bg-[var(--color-lightgreen)]"
+                        className="block px-4 py-2 text-sm text-white hover:bg-[var(--color-lightgreen)]"
                       >
                         My Orders
                       </Link>
                       <button
                         onClick={logout}
-                        className="block w-full text-left px-4 py-2 text-sm text-black hover:bg-[var(--color-lightgreen)]"
+                        className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-[var(--color-lightgreen)]"
                       >
                         Logout
                       </button>
@@ -201,13 +202,13 @@ const Header = () => {
                     <div className="absolute right-0 mt-2 w-48 bg-[var(--color-craemy)] rounded-md shadow-lg py-1 z-50">
                       <Link
                         to="/login"
-                        className="block px-4 py-2 text-sm text-black hover:bg-[var(--color-lightgreen)]"
+                        className="block px-4 py-2 text-sm text-white hover:bg-[var(--color-lightgreen)]"
                       >
                         Login
                       </Link>
                       <Link
                         to="/register"
-                        className="block px-4 py-2 text-sm text-black hover:bg-[var(--color-lightgreen)]"
+                        className="block px-4 py-2 text-sm text-white hover:bg-[var(--color-lightgreen)]"
                       >
                         Register
                       </Link>

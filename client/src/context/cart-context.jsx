@@ -18,10 +18,9 @@ const keyFrom = (product) => `${product.id}__${product.variant || "default"}`;
 function cartReducer(state, action) {
   switch (action.type) {
     case "SET_CART":
-      return { ...state, items: action.payload.items };
+      return { ...state, items: action.payload.items, alert: null };
     case "ADD": {
       const { product, qty } = action.payload;
-      toast.success(`✅ ${product.name} added to cart!`);
       const key = keyFrom(product);
       const existing = state.items.find((item) => item.key === key);
       let updatedItems;
@@ -32,7 +31,11 @@ function cartReducer(state, action) {
       } else {
         updatedItems = [...state.items, { key, ...product, qty }];
       }
-      return { ...state, items: updatedItems };
+      return {
+        ...state,
+        items: updatedItems,
+        alert: { type: "success", message: `✅ ${product.name} added to cart!` },
+      };
     }
     case "SET_QTY": {
       const { key, qty } = action.payload;
@@ -44,14 +47,15 @@ function cartReducer(state, action) {
       };
     }
     case "REMOVE":
-      toast.error("❌ Item removed from cart.");
       return {
         ...state,
         items: state.items.filter((item) => item.key !== action.payload.key),
+        alert: { type: "error", message: "❌ Item removed from cart." },
       };
     case "CLEAR":
-      toast.info("🛒 Cart cleared.");
-      return { ...state, items: [] };
+      return { ...state, items: [], alert: { type: "info", message: "🛒 Cart cleared." } };
+    case "CLEAR_ALERT":
+      return { ...state, alert: null };
     default:
       return state;
   }
@@ -60,9 +64,10 @@ function cartReducer(state, action) {
 function initCart() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : { items: [] };
+    const parsed = raw ? JSON.parse(raw) : { items: [], alert: null };
+    return { ...parsed, alert: null }; // Ensure alert is always null on init
   } catch {
-    return { items: [] };
+    return { items: [], alert: null };
   }
 }
 
@@ -73,6 +78,15 @@ export function CartProvider({ children }) {
   const authCtx = useContext(AuthContext);
   const isInitialMount = useRef(true);
 
+  // Effect for showing toast notifications
+  useEffect(() => {
+    if (state.alert) {
+      toast[state.alert.type](state.alert.message);
+      dispatch({ type: "CLEAR_ALERT" });
+    }
+  }, [state.alert]);
+
+  // Effect for syncing cart
   useEffect(() => {
     if (isInitialMount.current) {
       isInitialMount.current = false;
@@ -88,7 +102,7 @@ export function CartProvider({ children }) {
           console.error("Failed to sync cart to DB:", error);
         }
       } else {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ items: state.items }));
       }
     };
     syncCart();

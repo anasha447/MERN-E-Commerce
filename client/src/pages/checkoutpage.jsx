@@ -3,6 +3,7 @@ import { useCart } from "../context/cart-context";
 import { AuthContext } from "../context/AuthContext";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 const API_URL = "http://localhost:5000/api";
 
@@ -48,7 +49,7 @@ const CheckoutPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (items.length === 0) {
-      alert("Your cart is empty.");
+      toast.error("Your cart is empty.");
       return;
     }
     const orderData = {
@@ -72,7 +73,7 @@ const CheckoutPage = () => {
       };
 
       if (userInfo) {
-          config.headers.Authorization = `Bearer ${userInfo.token}`;
+        config.headers.Authorization = `Bearer ${userInfo.token}`;
       }
 
       const { data } = await axios.post(
@@ -83,18 +84,22 @@ const CheckoutPage = () => {
 
       clearCart();
 
-      // For guests, we might want to show a simple confirmation
-      // For logged-in users, we redirect to their order page
-      if(userInfo) {
+      if (userInfo) {
+        toast.success("Order placed successfully!");
         navigate(`/order/${data._id}`);
       } else {
-        alert(`Your order has been placed! Your order ID is ${data._id}`);
+        toast.success(
+          `Your order has been placed! Your order ID is ${data._id}`
+        );
         navigate("/");
       }
-
     } catch (error) {
-      console.error(error);
-      alert("There was an error placing your order.");
+      console.error("Checkout Error:", error.response || error);
+      const message =
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : "There was an error placing your order.";
+      toast.error(message);
     }
   };
 
