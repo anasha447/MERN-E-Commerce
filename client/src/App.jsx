@@ -8,7 +8,7 @@ import Home from "./pages/home";
 import ConsumptionMap from "./pages/what.is.mate";
 import StoryPage from "./pages/our_story";
 import ShopPage from "./pages/shop";
-import Cart from "./pages/cart";
+import CartPage from "./pages/CartPage";
 import SingleProductPage from "./pages/single-product-page";
 import CheckoutPage from "./pages/checkoutpage";
 import LoginPage from "./pages/auth/LoginPage";
@@ -34,68 +34,77 @@ import Header from "./components/header";
 import AppFooter from "./components/footer";
 
 // Context
-import { CartProvider } from "./context/cart-context";
+import { CartProvider, useCart } from "./context/cart-context";
 import { AuthProvider } from "./context/AuthContext";
+import CartDrawer from "./components/CartDrawer";
+
+const MainApp = () => {
+  const { isCartOpen, closeCart } = useCart();
+  return (
+    <Router>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+      <Header />
+      <GuestPopup />
+      <CartDrawer isOpen={isCartOpen} onClose={closeCart} />
+      <main className="min-h-screen bg-white">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/shop" element={<ShopPage />} />
+          <Route path="/what.is.mate" element={<ConsumptionMap />} />
+          <Route path="/our_story" element={<StoryPage />} />
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/track-order" element={<TrackOrderPage />} />
+          <Route path="/product/:id" element={<SingleProductPage />} />
+          <Route path="/checkoutpage" element={<CheckoutPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/forgotpassword" element={<ForgotPasswordPage />} />
+          <Route
+            path="/resetpassword/:token"
+            element={<ResetPasswordPage />}
+          />
+          <Route path="/profile" element={<ProfilePage />} />
+          <Route path="/order/:id" element={<OrderPage />} />
+          <Route
+            path="/order-confirmation/:id"
+            element={<OrderConfirmationPage />}
+          />
+          <Route path="/myorders" element={<OrderHistoryPage />} />
+          <Route path="/admin/dashboard" element={<DashboardPage />} />
+          <Route path="/admin/users" element={<UserListPage />} />
+          <Route path="/admin/user/:id/edit" element={<UserEditPage />} />
+          <Route path="/admin/orders" element={<OrderListPage />} />
+          <Route path="/admin/products" element={<ProductListPage />} />
+          <Route
+            path="/admin/product/create"
+            element={<ProductCreatePage />}
+          />
+          <Route
+            path="/admin/product/:id/edit"
+            element={<ProductEditPage />}
+          />
+        </Routes>
+      </main>
+      <AppFooter />
+    </Router>
+  );
+};
 
 function App() {
   return (
     <AuthProvider>
       <CartProvider>
-        <Router>
-          <ToastContainer
-            position="top-right"
-            autoClose={5000}
-            hideProgressBar={false}
-            newestOnTop={false}
-            closeOnClick
-            rtl={false}
-            pauseOnFocusLoss
-            draggable
-            pauseOnHover
-          />
-          <Header />
-          <GuestPopup />
-          <main className="min-h-screen bg-white">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/shop" element={<ShopPage />} />
-              <Route path="/what.is.mate" element={<ConsumptionMap />} />
-              <Route path="/our_story" element={<StoryPage />} />
-              <Route path="/cart" element={<Cart />} />
-              <Route path="/track-order" element={<TrackOrderPage />} />
-              <Route path="/product/:id" element={<SingleProductPage />} />
-              <Route path="/checkoutpage" element={<CheckoutPage />} />
-              <Route path="/login" element={<LoginPage />} />
-              <Route path="/register" element={<RegisterPage />} />
-              <Route path="/forgotpassword" element={<ForgotPasswordPage />} />
-              <Route
-                path="/resetpassword/:token"
-                element={<ResetPasswordPage />}
-              />
-              <Route path="/profile" element={<ProfilePage />} />
-              <Route path="/order/:id" element={<OrderPage />} />
-              <Route
-                path="/order-confirmation/:id"
-                element={<OrderConfirmationPage />}
-              />
-              <Route path="/myorders" element={<OrderHistoryPage />} />
-              <Route path="/admin/dashboard" element={<DashboardPage />} />
-              <Route path="/admin/users" element={<UserListPage />} />
-              <Route path="/admin/user/:id/edit" element={<UserEditPage />} />
-              <Route path="/admin/orders" element={<OrderListPage />} />
-              <Route path="/admin/products" element={<ProductListPage />} />
-              <Route
-                path="/admin/product/create"
-                element={<ProductCreatePage />}
-              />
-              <Route
-                path="/admin/product/:id/edit"
-                element={<ProductEditPage />}
-              />
-            </Routes>
-          </main>
-          <AppFooter />
-        </Router>
+        <MainApp />
       </CartProvider>
     </AuthProvider>
   );

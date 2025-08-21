@@ -38,11 +38,6 @@ const CheckoutPage = () => {
     }
   }, [userInfo]);
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
   const shippingCost = subtotal > 500 ? 0 : 50;
   const tax = subtotal * 0.18;
   const totalCost = subtotal + shippingCost + tax;
@@ -56,7 +51,7 @@ const CheckoutPage = () => {
       );
 
       const options = {
-        key: process.env.RAZORPAY_KEY_ID,
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
         amount: razorpayOrder.amount,
         currency: razorpayOrder.currency,
         name: "MaTeesa",

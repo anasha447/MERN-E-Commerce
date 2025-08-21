@@ -5,9 +5,13 @@ import orderConfirmationEmail from "../utils/emailTemplates/orderConfirmationEma
 import crypto from "crypto";
 
 const generateTrackingId = () => {
-  const timestamp = Date.now();
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  const datePart = `${year}${month}${day}`;
   const randomPart = crypto.randomBytes(2).toString("hex").toUpperCase();
-  return `MAT${timestamp}${randomPart}`;
+  return `ORD-${datePart}-${randomPart}`;
 };
 
 const addOrderItems = async (req, res) => {
@@ -139,10 +143,30 @@ const getMyOrders = async (req, res) => {
   res.json(orders);
 };
 
+const updateOrderStatus = async (req, res) => {
+  const order = await Order.findById(req.params.id);
+
+  if (order) {
+    order.status = req.body.status;
+
+    if (req.body.status === "Delivered") {
+      order.isDelivered = true;
+      order.deliveredAt = Date.now();
+    }
+
+    const updatedOrder = await order.save();
+    res.json(updatedOrder);
+  } else {
+    res.status(404);
+    throw new Error("Order not found");
+  }
+};
+
 export {
   addOrderItems,
   getOrderById,
   updateOrderToPaid,
   getMyOrders,
   trackOrder,
+  updateOrderStatus,
 };

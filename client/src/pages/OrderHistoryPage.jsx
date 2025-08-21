@@ -92,12 +92,28 @@ const OrderHistoryPage = () => {
                     {order.paymentMethod}
                   </td>
                   <td className="py-4 px-6 whitespace-nowrap text-right">
-                    <Link
-                      to={`/order/${order._id}`}
-                      className="text-[var(--color-green)] hover:text-[var(--color-lightgreen)] font-bold"
-                    >
-                      Details
-                    </Link>
+                    <div className="flex flex-col items-end">
+                      <Link
+                        to={`/order/${order._id}`}
+                        className="text-[var(--color-green)] hover:text-[var(--color-lightgreen)] font-bold mb-2"
+                      >
+                        View Details
+                      </Link>
+                      {order.status === "Delivered" && (
+                        <div className="mt-2">
+                          <h4 className="font-semibold text-sm">Rate Products:</h4>
+                          {order.orderItems.map((item) => (
+                            <Link
+                              key={item.product}
+                              to={`/product/${item.product}`}
+                              className="block text-xs text-blue-500 hover:underline"
+                            >
+                              {item.name}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}
