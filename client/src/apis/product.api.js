@@ -40,3 +40,14 @@ export const getFeaturedProducts = async () => {
     throw error;
   }
 };
+
+// ✅ Create product review
+export const createProductReview = async (productId, reviewData) => {
+  try {
+    const { data } = await api.post(`/products/${productId}/reviews`, reviewData);
+    return data;
+  } catch (error) {
+    console.error(`❌ Error creating review for product ${productId}:`, error.message);
+    throw error;
+  }
+};
