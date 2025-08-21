@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { FaEdit, FaTrash } from "react-icons/fa";
 
+const API_URL = "http://localhost:5000/api";
+
 const UserListPage = () => {
   const { userInfo } = useContext(AuthContext);
   const [users, setUsers] = useState([]);
@@ -17,7 +19,7 @@ const UserListPage = () => {
             Authorization: `Bearer ${userInfo.token}`,
           },
         };
-        const { data } = await axios.get("/api/admin/users", config);
+        const { data } = await axios.get(`${API_URL}/admin/users`, config);
         setUsers(data);
         setLoading(false);
       } catch (error) {
@@ -40,7 +42,7 @@ const UserListPage = () => {
             Authorization: `Bearer ${userInfo.token}`,
           },
         };
-        await axios.delete(`/api/admin/users/${id}`, config);
+        await axios.delete(`${API_URL}/admin/users/${id}`, config);
         setUsers(users.filter((user) => user._id !== id));
       } catch (error) {
         console.error(error);

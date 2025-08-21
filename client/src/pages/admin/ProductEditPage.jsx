@@ -3,6 +3,8 @@ import axios from "axios";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 
+const API_URL = "http://localhost:5000/api";
+
 const ProductEditPage = () => {
   const { id: productId } = useParams();
   const navigate = useNavigate();
@@ -19,7 +21,7 @@ const ProductEditPage = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const { data } = await axios.get(`/api/products/${productId}`);
+        const { data } = await axios.get(`${API_URL}/products/${productId}`);
         setName(data.name);
         setPrice(data.price);
         setImage(data.image);
@@ -46,7 +48,7 @@ const ProductEditPage = () => {
         },
       };
       await axios.put(
-        `/api/products/${productId}`,
+        `${API_URL}/products/${productId}`,
         {
           name,
           price,

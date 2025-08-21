@@ -4,6 +4,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 
+const API_URL = "http://localhost:5000/api";
+
 const ProductListPage = () => {
   const { userInfo } = useContext(AuthContext);
   const navigate = useNavigate();
@@ -13,7 +15,7 @@ const ProductListPage = () => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const { data } = await axios.get("/api/products");
+        const { data } = await axios.get(`${API_URL}/products`);
         setProducts(data);
         setLoading(false);
       } catch (error) {
@@ -32,7 +34,7 @@ const ProductListPage = () => {
             Authorization: `Bearer ${userInfo.token}`,
           },
         };
-        await axios.delete(`/api/products/${id}`, config);
+        await axios.delete(`${API_URL}/products/${id}`, config);
         setProducts(products.filter((product) => product._id !== id));
       } catch (error) {
         console.error(error);
@@ -48,7 +50,7 @@ const ProductListPage = () => {
             Authorization: `Bearer ${userInfo.token}`,
           },
         };
-        const { data } = await axios.post("/api/products", {}, config);
+        const { data } = await axios.post(`${API_URL}/products`, {}, config);
         navigate(`/admin/product/${data._id}/edit`);
       } catch (error) {
         console.error(error);

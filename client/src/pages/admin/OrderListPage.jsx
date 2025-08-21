@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { FaEye } from "react-icons/fa";
 
+const API_URL = "http://localhost:5000/api";
+
 const OrderListPage = () => {
   const { userInfo } = useContext(AuthContext);
   const [orders, setOrders] = useState([]);
@@ -17,7 +19,7 @@ const OrderListPage = () => {
             Authorization: `Bearer ${userInfo.token}`,
           },
         };
-        const { data } = await axios.get("/api/admin/orders", config);
+        const { data } = await axios.get(`${API_URL}/admin/orders`, config);
         setOrders(data);
         setLoading(false);
       } catch (error) {
@@ -40,8 +42,8 @@ const OrderListPage = () => {
             Authorization: `Bearer ${userInfo.token}`,
           },
         };
-        await axios.put(`/api/admin/orders/${id}/deliver`, {}, config);
-        const { data } = await axios.get("/api/admin/orders", config);
+        await axios.put(`${API_URL}/admin/orders/${id}/deliver`, {}, config);
+        const { data } = await axios.get(`${API_URL}/admin/orders`, config);
         setOrders(data);
       } catch (error) {
         console.error(error);

@@ -3,6 +3,8 @@ import axios from "axios";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 
+const API_URL = "http://localhost:5000/api";
+
 const UserEditPage = () => {
   const { id: userId } = useParams();
   const navigate = useNavigate();
@@ -20,7 +22,10 @@ const UserEditPage = () => {
             Authorization: `Bearer ${userInfo.token}`,
           },
         };
-        const { data } = await axios.get(`/api/admin/users/${userId}`, config);
+        const { data } = await axios.get(
+          `${API_URL}/admin/users/${userId}`,
+          config
+        );
         setName(data.name);
         setEmail(data.email);
         setIsAdmin(data.isAdmin);
@@ -47,7 +52,7 @@ const UserEditPage = () => {
         },
       };
       await axios.put(
-        `/api/admin/users/${userId}`,
+        `${API_URL}/admin/users/${userId}`,
         { name, email, isAdmin },
         config
       );
