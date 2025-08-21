@@ -3,6 +3,8 @@ import axios from "axios";
 import { useParams } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
 
+const API_URL = "http://localhost:5000/api";
+
 const OrderPage = () => {
   const { id: orderId } = useParams();
   const { userInfo } = useContext(AuthContext);
@@ -11,13 +13,20 @@ const OrderPage = () => {
 
   useEffect(() => {
     const fetchOrder = async () => {
+      if (!userInfo) {
+        setLoading(false);
+        return;
+      }
       try {
         const config = {
           headers: {
             Authorization: `Bearer ${userInfo.token}`,
           },
         };
-        const { data } = await axios.get(`/api/orders/${orderId}`, config);
+        const { data } = await axios.get(
+          `${API_URL}/orders/${orderId}`,
+          config
+        );
         setOrder(data);
         setLoading(false);
       } catch (error) {
@@ -25,9 +34,7 @@ const OrderPage = () => {
         setLoading(false);
       }
     };
-    if (userInfo) {
-      fetchOrder();
-    }
+    fetchOrder();
   }, [orderId, userInfo]);
 
   return loading ? (
@@ -81,7 +88,10 @@ const OrderPage = () => {
           <div className="bg-white shadow-md rounded-lg p-8 mt-8">
             <h2 className="text-2xl font-bold mb-4">Order Items</h2>
             {order.orderItems.map((item, index) => (
-              <div key={index} className="flex justify-between items-center mb-4">
+              <div
+                key={index}
+                className="flex justify-between items-center mb-4"
+              >
                 <div className="flex items-center">
                   <img
                     src={item.image}

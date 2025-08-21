@@ -1,4 +1,7 @@
 import Order from "../models/orderModel.js";
+import User from "../models/userModel.js";
+import sendEmail from "../utils/sendEmail.js";
+import orderConfirmationEmail from "../utils/emailTemplates/orderConfirmationEmail.js";
 
 const addOrderItems = async (req, res) => {
   const {
@@ -14,22 +17,53 @@ const addOrderItems = async (req, res) => {
   if (orderItems && orderItems.length === 0) {
     res.status(400).json({ message: "No order items" });
     return;
-  } else {
-    const order = new Order({
-      orderItems,
-      user: req.user._id,
-      shippingAddress,
-      paymentMethod,
-      itemsPrice,
-      taxPrice,
-      shippingPrice,
-      totalPrice,
-    });
-
-    const createdOrder = await order.save();
-
-    res.status(201).json(createdOrder);
   }
+
+  let userForOrder;
+  if (req.user) {
+    userForOrder = req.user;
+  } else {
+    const { email, name } = shippingAddress;
+    if (!email) {
+      res.status(400).json({ message: "Email is required for guest checkout" });
+      return;
+    }
+    let guestUser = await User.findOne({ email, isGuest: true });
+    if (!guestUser) {
+      guestUser = await User.create({
+        name: name || "Guest",
+        email,
+        password: Date.now().toString(),
+        isGuest: true,
+      });
+    }
+    userForOrder = guestUser;
+  }
+
+  const order = new Order({
+    orderItems,
+    user: userForOrder._id,
+    shippingAddress,
+    paymentMethod,
+    itemsPrice,
+    taxPrice,
+    shippingPrice,
+    totalPrice,
+  });
+
+  const createdOrder = await order.save();
+
+  try {
+    await sendEmail({
+      email: shippingAddress.email,
+      subject: `Your MaTeesa Order Confirmation [${createdOrder._id}]`,
+      html: orderConfirmationEmail(createdOrder),
+    });
+  } catch (error) {
+    console.error("Order confirmation email could not be sent.", error);
+  }
+
+  res.status(201).json(createdOrder);
 };
 
 const getOrderById = async (req, res) => {
@@ -59,7 +93,6 @@ const updateOrderToPaid = async (req, res) => {
     };
 
     const updatedOrder = await order.save();
-
     res.json(updatedOrder);
   } else {
     res.status(404).json({ message: "Order not found" });
