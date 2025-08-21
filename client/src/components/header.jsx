@@ -14,8 +14,13 @@ const Header = () => {
   let userMenuTimeout;
   let adminMenuTimeout;
 
-  const { itemCount } = useCart();
-  const { userInfo, logout } = useContext(AuthContext);
+  const { itemCount, clearCart } = useCart();
+  const { userInfo, logout: authLogout } = useContext(AuthContext);
+
+  const handleLogout = () => {
+    authLogout();
+    clearCart();
+  };
 
   const getGravatarURL = (email) => {
     if (!email) return "";
@@ -72,7 +77,6 @@ const Header = () => {
                 { name: "Shop", path: "/shop" },
                 { name: "What is mate?!", path: "/what.is.mate" },
                 { name: "Our Story", path: "/our_story" },
-                { name: "Track Order", path: "/track-order" },
               ].map((item) => (
                 <li key={item.path}>
                   <NavLink
@@ -149,7 +153,7 @@ const Header = () => {
                       Products
                     </Link>
                     <button
-                      onClick={logout}
+                      onClick={handleLogout}
                       className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-[var(--color-lightgreen)]"
                     >
                       Logout
@@ -192,8 +196,14 @@ const Header = () => {
                       >
                         My Orders
                       </Link>
+                      <Link
+                        to="/track-order"
+                        className="block px-4 py-2 text-sm text-white hover:bg-[var(--color-lightgreen)]"
+                      >
+                        Track Order
+                      </Link>
                       <button
-                        onClick={logout}
+                        onClick={handleLogout}
                         className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-[var(--color-lightgreen)]"
                       >
                         Logout
@@ -212,6 +222,12 @@ const Header = () => {
                         className="block px-4 py-2 text-sm text-white hover:bg-[var(--color-lightgreen)]"
                       >
                         Register
+                      </Link>
+                      <Link
+                        to="/track-order"
+                        className="block px-4 py-2 text-sm text-white hover:bg-[var(--color-lightgreen)]"
+                      >
+                        Track Order
                       </Link>
                     </div>
                   ))}

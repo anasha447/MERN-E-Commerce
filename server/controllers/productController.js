@@ -23,6 +23,14 @@ const getProductById = asyncHandler(async (req, res) => {
   }
 });
 
+// @desc    Get all unique categories
+// @route   GET /api/products/categories
+// @access  Public
+const getProductCategories = asyncHandler(async (req, res) => {
+  const categories = await Product.find().distinct("category");
+  res.json(categories);
+});
+
 // @desc    Get featured products
 // @route   GET /api/products/featured
 // @access  Public
@@ -98,6 +106,7 @@ export {
   getProducts,
   getProductById,
   getFeaturedProducts,
+  getProductCategories,
   createProduct,
   updateProduct,
   deleteProduct,

@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import axios from "axios";
 import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
@@ -14,11 +14,34 @@ const ProductCreatePage = () => {
   const [image, setImage] = useState("");
   const [brand, setBrand] = useState("");
   const [category, setCategory] = useState("");
+  const [newCategory, setNewCategory] = useState("");
+  const [categories, setCategories] = useState([]);
   const [countInStock, setCountInStock] = useState(0);
   const [description, setDescription] = useState("");
 
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const { data } = await axios.get(`${API_URL}/products/categories`);
+        setCategories(data);
+        if (data.length > 0) {
+          setCategory(data[0]);
+        }
+      } catch (error) {
+        toast.error("Could not fetch categories");
+      }
+    };
+    fetchCategories();
+  }, []);
+
   const submitHandler = async (e) => {
     e.preventDefault();
+    const finalCategory = category === "new" ? newCategory : category;
+    if (!finalCategory) {
+      toast.error("Please select or enter a category.");
+      return;
+    }
+
     try {
       const config = {
         headers: {
@@ -33,7 +56,7 @@ const ProductCreatePage = () => {
           price,
           image,
           brand,
-          category,
+          category: finalCategory,
           countInStock,
           description,
         },
@@ -103,7 +126,7 @@ const ProductCreatePage = () => {
               className="block text-[var(--color-darkgreen)] text-lg font-bold mb-2 font-heading"
               htmlFor="image"
             >
-              Image
+              Image URL
             </label>
             <input
               className="shadow-sm appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -139,15 +162,29 @@ const ProductCreatePage = () => {
             >
               Category
             </label>
-            <input
-              className="shadow-sm appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            <select
               id="category"
-              type="text"
-              placeholder="Enter category"
               value={category}
               onChange={(e) => setCategory(e.target.value)}
-              required
-            />
+              className="shadow-sm appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            >
+              {categories.map((cat) => (
+                <option key={cat} value={cat}>
+                  {cat}
+                </option>
+              ))}
+              <option value="new">-- Add New Category --</option>
+            </select>
+            {category === "new" && (
+              <input
+                className="mt-2 shadow-sm appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                type="text"
+                placeholder="Enter new category name"
+                value={newCategory}
+                onChange={(e) => setNewCategory(e.target.value)}
+                required
+              />
+            )}
           </div>
           <div className="mb-6">
             <label

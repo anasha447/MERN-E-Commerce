@@ -3,6 +3,7 @@ import {
   getProducts,
   getProductById,
   getFeaturedProducts,
+  getProductCategories,
   createProduct,
   updateProduct,
   deleteProduct,
@@ -13,6 +14,7 @@ const router = express.Router();
 
 router.route("/").get(getProducts).post(protect, admin, createProduct);
 router.get("/featured", getFeaturedProducts);
+router.get("/categories", getProductCategories);
 router
   .route("/:id")
   .get(getProductById)
