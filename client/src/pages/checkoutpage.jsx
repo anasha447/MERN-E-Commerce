@@ -38,6 +38,11 @@ const CheckoutPage = () => {
     }
   }, [userInfo]);
 
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  };
+
   const shippingCost = subtotal > 500 ? 0 : 50;
   const tax = subtotal * 0.18;
   const totalCost = subtotal + shippingCost + tax;
@@ -153,7 +158,34 @@ const CheckoutPage = () => {
               Shipping Information
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Form fields remain the same */}
+              <div>
+                <label htmlFor="name" className="block text-sm font-medium text-gray-700">Full Name</label>
+                <input type="text" name="name" id="name" value={formData.name} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required />
+              </div>
+              <div>
+                <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email Address</label>
+                <input type="email" name="email" id="email" value={formData.email} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required />
+              </div>
+              <div className="md:col-span-2">
+                <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Phone Number</label>
+                <input type="tel" name="phone" id="phone" value={formData.phone} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required />
+              </div>
+              <div className="md:col-span-2">
+                <label htmlFor="address" className="block text-sm font-medium text-gray-700">Street Address</label>
+                <input type="text" name="address" id="address" value={formData.address} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required />
+              </div>
+              <div>
+                <label htmlFor="city" className="block text-sm font-medium text-gray-700">City</label>
+                <input type="text" name="city" id="city" value={formData.city} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required />
+              </div>
+              <div>
+                <label htmlFor="postalCode" className="block text-sm font-medium text-gray-700">Postal Code</label>
+                <input type="text" name="postalCode" id="postalCode" value={formData.postalCode} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required />
+              </div>
+              <div className="md:col-span-2">
+                 <label htmlFor="country" className="block text-sm font-medium text-gray-700">Country</label>
+                <input type="text" name="country" id="country" value={formData.country} onChange={handleInputChange} className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" required />
+              </div>
             </div>
           </div>
           <div className="bg-white p-8 rounded-lg shadow-md border border-gray-200">
