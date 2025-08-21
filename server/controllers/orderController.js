@@ -40,16 +40,20 @@ const addOrderItems = async (req, res) => {
         .status(400)
         .json({ message: "Email is required for guest checkout" });
     }
-    let guestUser = await User.findOne({ email, isGuest: true });
-    if (!guestUser) {
-      guestUser = await User.create({
+
+    let existingUser = await User.findOne({ email });
+
+    if (existingUser) {
+      userForOrder = existingUser;
+    } else {
+      const newGuestUser = await User.create({
         name: name || "Guest",
         email,
-        password: Date.now().toString(),
+        password: Date.now().toString(), // Create a temporary password
         isGuest: true,
       });
+      userForOrder = newGuestUser;
     }
-    userForOrder = guestUser;
   }
 
   const trackingId = generateTrackingId();
