@@ -69,7 +69,7 @@ const CartContext = createContext(null);
 
 export function CartProvider({ children }) {
   const [state, dispatch] = useReducer(cartReducer, undefined, initCart);
-  const { userInfo } = useContext(AuthContext);
+  const authCtx = useContext(AuthContext); // Get the whole context
   const isInitialMount = useRef(true);
 
   // Persist cart to localStorage for GUEST users only
@@ -80,6 +80,9 @@ export function CartProvider({ children }) {
       isInitialMount.current = false;
       return;
     }
+
+    // Now we can safely access userInfo
+    const userInfo = authCtx ? authCtx.userInfo : null;
 
     const syncCart = async () => {
       if (userInfo && !userInfo.isAdmin) {
@@ -95,7 +98,7 @@ export function CartProvider({ children }) {
     };
 
     syncCart();
-  }, [state.items, userInfo]);
+  }, [state.items, authCtx]);
 
   // Auto-clear alert
   useEffect(() => {
@@ -121,10 +124,8 @@ export function CartProvider({ children }) {
 
       const mergedCartMap = new Map();
 
-      // Add DB cart items to map
       dbCart.forEach(item => mergedCartMap.set(item.key, item));
 
-      // Merge guest cart items
       let itemsMerged = false;
       guestCart.forEach(guestItem => {
         if (mergedCartMap.has(guestItem.key)) {
