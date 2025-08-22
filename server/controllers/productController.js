@@ -47,11 +47,15 @@ const createProduct = asyncHandler(async (req, res) => {
   const { name, price, description, images, brand, category, countInStock } =
     req.body;
 
+  const processedImages = (images || []).map(img =>
+    img.startsWith('/public') ? img : `/public${img.startsWith('/') ? '' : '/'}${img}`
+  );
+
   const product = new Product({
     name,
     price,
     user: req.user._id,
-    images: images || [],
+    images: processedImages,
     brand,
     category,
     countInStock,
@@ -75,10 +79,15 @@ const updateProduct = asyncHandler(async (req, res) => {
     product.name = name || product.name;
     product.price = price || product.price;
     product.description = description || product.description;
-    product.images = images || product.images;
     product.brand = brand || product.brand;
     product.category = category || product.category;
-    product.countInStock = countInStock || product.countInStock;
+    product.countInStock = countInStock ?? product.countInStock;
+
+    if (images) {
+      product.images = images.map(img =>
+        img.startsWith('/public') ? img : `/public${img.startsWith('/') ? '' : '/'}${img}`
+      );
+    }
 
     const updatedProduct = await product.save();
     res.json(updatedProduct);

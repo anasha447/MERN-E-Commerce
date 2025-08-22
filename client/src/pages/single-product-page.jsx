@@ -56,12 +56,6 @@ const SingleProductPage = () => {
     fetchProduct();
   }, [fetchProduct]);
 
-  const handleVariantChange = (e) => {
-    const variantName = e.target.value;
-    const variant = product.variants.find((v) => v.name === variantName);
-    setSelectedVariant(variant);
-  };
-
   const handleAddToCart = (openDrawer = true) => {
     if (!product) return;
 
