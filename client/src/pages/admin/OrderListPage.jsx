@@ -48,10 +48,15 @@ const OrderListPage = () => {
         },
       };
       await axios.put(`${API_URL}/orders/${orderId}/status`, { status: newStatus }, config);
-      toast.success(`Order ${orderId} status updated to ${newStatus}`);
+      toast.success(`Order status updated to ${newStatus}`);
       setOrders(orders.map(o => o._id === orderId ? {...o, status: newStatus, isDelivered: newStatus === 'Delivered'} : o));
     } catch (error) {
-      toast.error("Failed to update order status.");
+      const message =
+        error.response?.data?.message ||
+        error.message ||
+        "Failed to update order status.";
+      toast.error(message);
+      console.error("Status Update Error:", error.response || error);
     }
   };
 
