@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { FaEye } from "react-icons/fa";
 import Spinner from "../../components/Spinner";
+import { toast } from "react-toastify";
 
 const API_URL = "http://localhost:5000/api";
 
@@ -12,22 +13,25 @@ const OrderListPage = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const fetchOrders = async () => {
+    setLoading(true);
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${userInfo.token}`,
+        },
+      };
+      const { data } = await axios.get(`${API_URL}/admin/orders`, config);
+      setOrders(data);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to fetch orders.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        const config = {
-          headers: {
-            Authorization: `Bearer ${userInfo.token}`,
-          },
-        };
-        const { data } = await axios.get(`${API_URL}/admin/orders`, config);
-        setOrders(data);
-        setLoading(false);
-      } catch (error) {
-        console.error(error);
-        setLoading(false);
-      }
-    };
     if (userInfo && userInfo.isAdmin) {
       fetchOrders();
     } else {
@@ -35,20 +39,19 @@ const OrderListPage = () => {
     }
   }, [userInfo]);
 
-  const deliverHandler = async (id) => {
-    if (window.confirm("Mark this order as delivered?")) {
-      try {
-        const config = {
-          headers: {
-            Authorization: `Bearer ${userInfo.token}`,
-          },
-        };
-        await axios.put(`${API_URL}/admin/orders/${id}/deliver`, {}, config);
-        const { data } = await axios.get(`${API_URL}/admin/orders`, config);
-        setOrders(data);
-      } catch (error) {
-        console.error(error);
-      }
+  const handleStatusChange = async (orderId, newStatus) => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userInfo.token}`,
+        },
+      };
+      await axios.put(`${API_URL}/orders/${orderId}/status`, { status: newStatus }, config);
+      toast.success(`Order ${orderId} status updated to ${newStatus}`);
+      setOrders(orders.map(o => o._id === orderId ? {...o, status: newStatus, isDelivered: newStatus === 'Delivered'} : o));
+    } catch (error) {
+      toast.error("Failed to update order status.");
     }
   };
 
@@ -60,19 +63,17 @@ const OrderListPage = () => {
       {loading ? (
         <Spinner />
       ) : (
-        <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+        <div className="bg-white shadow-lg rounded-lg overflow-x-auto">
           <table className="min-w-full">
             <thead className="bg-[var(--color-darkgreen)] text-[var(--color-craemy)]">
               <tr>
-                <th className="py-3 px-6 text-left font-heading">ID</th>
+                <th className="py-3 px-6 text-left font-heading">Tracking ID</th>
                 <th className="py-3 px-6 text-left font-heading">User</th>
                 <th className="py-3 px-6 text-left font-heading">Date</th>
+                <th className="py-3 px-6 text-left font-heading">Products</th>
                 <th className="py-3 px-6 text-left font-heading">Total</th>
                 <th className="py-3 px-6 text-left font-heading">Paid</th>
-                <th className="py-3 px-6 text-left font-heading">Delivered</th>
-                <th className="py-3 px-6 text-left font-heading">
-                  Payment Method
-                </th>
+                <th className="py-3 px-6 text-left font-heading">Shipping Info</th>
                 <th className="py-3 px-6 text-left font-heading">Actions</th>
               </tr>
             </thead>
@@ -80,15 +81,18 @@ const OrderListPage = () => {
               {Array.isArray(orders) &&
                 orders.map((order) => (
                   <tr key={order._id} className="hover:bg-gray-50">
-                    <td className="py-4 px-6">{order._id}</td>
+                    <td className="py-4 px-6 font-mono text-sm">{order.trackingId}</td>
                     <td className="py-4 px-6">
                       {order.user ? order.user.name : "Guest"}
                     </td>
                     <td className="py-4 px-6">
                       {new Date(order.createdAt).toLocaleDateString()}
                     </td>
+                    <td className="py-4 px-6 text-sm">
+                      {order.orderItems.map(item => item.product ? item.product.name : 'N/A').join(', ')}
+                    </td>
                     <td className="py-4 px-6">
-                      ${order.totalPrice.toFixed(2)}
+                      ₹{order.totalPrice.toFixed(2)}
                     </td>
                     <td className="py-4 px-6">
                       {order.isPaid ? (
@@ -98,18 +102,22 @@ const OrderListPage = () => {
                       )}
                     </td>
                     <td className="py-4 px-6">
-                      {order.isDelivered ? (
-                        <span className="text-green-500 font-bold">Yes</span>
-                      ) : (
-                        <button
-                          onClick={() => deliverHandler(order._id)}
-                          className="bg-[var(--color-orange)] text-white py-1 px-3 rounded-full text-sm hover:opacity-90"
-                        >
-                          Mark Delivered
-                        </button>
-                      )}
+                      <select
+                        value={order.status}
+                        onChange={(e) => handleStatusChange(order._id, e.target.value)}
+                        className="p-1 border rounded-md text-sm"
+                      >
+                        <option value="Pending">Pending</option>
+                        <option value="Confirmed">Confirmed</option>
+                        <option value="Paid">Paid</option>
+                        <option value="Dispatched">Dispatched</option>
+                        <option value="Shipped">Shipped</option>
+                        <option value="In Transit">In Transit</option>
+                        <option value="Delivered">Delivered</option>
+                        <option value="Cancelled">Cancelled</option>
+                        <option value="Returned">Returned</option>
+                      </select>
                     </td>
-                    <td className="py-4 px-6">{order.paymentMethod}</td>
                     <td className="py-4 px-6">
                       <Link
                         to={`/order/${order._id}`}

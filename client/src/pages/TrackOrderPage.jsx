@@ -105,22 +105,18 @@ const TrackOrderPage = () => {
             </h2>
             <div className="space-y-4">
               <p>
-                <strong>Order ID:</strong> {order._id}
+                <strong>Tracking ID:</strong> {order.trackingId}
               </p>
               <p>
                 <strong>Status:</strong>{" "}
-                {order.isDelivered ? (
-                  <span className="text-green-500 font-bold">Delivered</span>
-                ) : (
-                  <span className="text-blue-500 font-bold">Processing</span>
-                )}
+                <span className="font-bold text-blue-600">{order.status}</span>
               </p>
               <p>
                 <strong>Date:</strong>{" "}
                 {new Date(order.createdAt).toLocaleDateString()}
               </p>
               <p>
-                <strong>Total:</strong> ${order.totalPrice.toFixed(2)}
+                <strong>Total:</strong> ₹{order.totalPrice.toFixed(2)}
               </p>
             </div>
           </div>
