@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
@@ -13,7 +13,7 @@ const OrderListPage = () => {
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchOrders = async () => {
+  const fetchOrders = useCallback(async () => {
     setLoading(true);
     try {
       const config = {
@@ -29,7 +29,7 @@ const OrderListPage = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, [userInfo]);
 
   useEffect(() => {
     if (userInfo && userInfo.isAdmin) {
@@ -37,7 +37,7 @@ const OrderListPage = () => {
     } else {
       setLoading(false);
     }
-  }, [userInfo]);
+  }, [userInfo, fetchOrders]);
 
   const handleStatusChange = async (orderId, newStatus) => {
     try {
