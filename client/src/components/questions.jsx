@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Plus, Minus } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 
 const faqData = [
   {
@@ -28,30 +28,34 @@ const faqData = [
     answer:
       "Yerba Mate is rich in antioxidants, vitamins, and minerals. It's known to boost mental focus, improve physical performance, aid in digestion, and support weight management. The addition of Indian spices can also provide anti-inflammatory benefits.",
   },
+  {
+      question: "Why Yerba Mate cost this match ?",
+    answer: "We are importing yerba mate from the source country Argentina, which is known for its high-quality mate. The cost reflects the premium quality of the leaves, the traditional harvesting methods, and the unique blends we create with Indian spices. We believe in providing a product that is both authentic and beneficial, which justifies the price.",  
+    },
 ];
 
 const AccordionItem = ({ item, isOpen, onClick }) => {
   return (
-    <div className="border-b border-gray-200 py-4">
+    <div className="bg-c border-b border-gray-200 py-4">
       <button
         onClick={onClick}
         className="w-full flex justify-between items-center text-left"
       >
-        <span className="text-lg font-semibold text-[var(--color-darkgreen)] font-body">
+        <span className="text-lg font-semibold text-[var(--color-darkgreen)] font-heading">
           {item.question}
         </span>
-        {isOpen ? <Minus size={20} /> : <Plus size={20} />}
+        {isOpen ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
       </button>
       <AnimatePresence>
-        {isOpen && (
+        {isOpen && (      
           <motion.div
             initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: "auto" }}
+            animate={{ opacity:2, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
             className="overflow-hidden"
           >
-            <p className="pt-4 text-gray-600 font-body">{item.answer}</p>
+            <p className="pt-4 text-gray-600 font-body font-semibold">{item.answer}</p>
           </motion.div>
         )}
       </AnimatePresence>
