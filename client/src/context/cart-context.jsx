@@ -151,9 +151,11 @@ export function CartProvider({ children }) {
   const openCart = () => setIsCartOpen(true);
   const closeCart = () => setIsCartOpen(false);
 
-  const addToCart = (product, qty = 1) => {
+  const addToCart = (product, qty = 1, options = { openDrawer: true }) => {
     dispatch({ type: "ADD", payload: { product, qty } });
-    openCart();
+    if (options.openDrawer) {
+      openCart();
+    }
   };
   const setQty = (key, qty) => dispatch({ type: "SET_QTY", payload: { key, qty } });
   const removeFromCart = (key) => dispatch({ type: "REMOVE", payload: { key } });

@@ -62,7 +62,7 @@ const SingleProductPage = () => {
     setSelectedVariant(variant);
   };
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (openDrawer = true) => {
     if (!product) return;
 
     const itemToAdd = {
@@ -72,11 +72,11 @@ const SingleProductPage = () => {
       price: selectedVariant ? selectedVariant.price : product.price,
       variant: selectedVariant ? selectedVariant.name : null,
     };
-    addToCart(itemToAdd, 1);
+    addToCart(itemToAdd, 1, { openDrawer });
   };
 
   const handleBuyNow = () => {
-    handleAddToCart();
+    handleAddToCart(false); // Add to cart without opening the drawer
     navigate("/checkoutpage");
   };
 
@@ -116,27 +116,33 @@ const SingleProductPage = () => {
       <div className="container mx-auto">
         <div className="flex flex-col md:flex-row items-start">
           <div className="w-full md:w-1/2 flex flex-col items-center">
-            <div className="w-full flex justify-center">
-              <img
-                src={mainImage}
-                alt={product.name}
-                className="rounded-xl shadow-lg max-h-[500px] object-cover"
-              />
-            </div>
-            <div className="flex space-x-2 mt-4">
-              {product.images &&
-                product.images.map((img, index) => (
+            {mainImage && (
+              <>
+                <div className="w-full flex justify-center">
                   <img
-                    key={index}
-                    src={img}
-                    alt={`${product.name} thumbnail ${index + 1}`}
-                    className={`w-20 h-20 object-cover rounded-md cursor-pointer border-2 ${
-                      mainImage === img ? "border-[var(--color-orange)]" : "border-transparent"
-                    }`}
-                    onClick={() => setMainImage(img)}
+                    src={mainImage}
+                    alt={product.name}
+                    className="rounded-xl shadow-lg max-h-[500px] object-cover"
                   />
-                ))}
-            </div>
+                </div>
+                <div className="flex space-x-2 mt-4">
+                  {product.images &&
+                    product.images.map((img, index) => (
+                      <img
+                        key={index}
+                        src={img}
+                        alt={`${product.name} thumbnail ${index + 1}`}
+                        className={`w-20 h-20 object-cover rounded-md cursor-pointer border-2 ${
+                          mainImage === img
+                            ? "border-[var(--color-orange)]"
+                            : "border-transparent"
+                        }`}
+                        onClick={() => setMainImage(img)}
+                      />
+                    ))}
+                </div>
+              </>
+            )}
           </div>
 
           <div className="w-full md:w-1/2 mt-10 md:mt-0 md:pl-12">
@@ -153,20 +159,24 @@ const SingleProductPage = () => {
 
             {product.variants && product.variants.length > 0 && (
               <div className="mt-6">
-                <label className="block text-gray-800 mb-2">
-                  Choose Variant:
+                <label className="block text-gray-800 mb-2 font-semibold">
+                  Choose Weight:
                 </label>
-                <select
-                  value={selectedVariant ? selectedVariant.name : ""}
-                  onChange={handleVariantChange}
-                  className="border p-2 rounded-lg bg-white"
-                >
+                <div className="flex space-x-2">
                   {product.variants.map((v, index) => (
-                    <option key={index} value={v.name}>
+                    <button
+                      key={index}
+                      onClick={() => setSelectedVariant(v)}
+                      className={`py-2 px-4 rounded-full border-2 transition-colors ${
+                        selectedVariant && selectedVariant.name === v.name
+                          ? "bg-[var(--color-orange)] text-white border-[var(--color-orange)]"
+                          : "bg-white text-gray-700 border-gray-300 hover:border-gray-500"
+                      }`}
+                    >
                       {v.name}
-                    </option>
+                    </button>
                   ))}
-                </select>
+                </div>
               </div>
             )}
 
@@ -191,7 +201,7 @@ const SingleProductPage = () => {
           </div>
         </div>
 
-        <div className="mt-16">
+        <div className="mt-16 border-t pt-12">
           <h2 className="text-3xl font-bold mb-6">Reviews</h2>
           {product.reviews.length === 0 && <p>No reviews yet.</p>}
           <div className="space-y-6">

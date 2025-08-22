@@ -1,3 +1,4 @@
+import path from "path";
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -15,6 +16,11 @@ connectDB();
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// Serve static files
+const __dirname = path.resolve();
+app.use("/public", express.static(path.join(__dirname, "/client/public")));
+
 
 // Routes
 app.use("/api/products", productRoutes);

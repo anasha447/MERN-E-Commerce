@@ -46,7 +46,7 @@ export default function SingleProduct({ product }) {
               Add to Cart
             </button>
             <button
-              className="bg-[#4CAF50] text-black hover:bg-[#388E3C] rounded-xl px-6 py-3 text-lg font-semibold transition duration-200"
+              className="bg-[#4CAF50] text-white hover:bg-[#388E3C] rounded-xl px-6 py-3 text-lg font-semibold transition duration-200"
               onClick={handleBuyNow}
             >
               Buy Now

@@ -83,7 +83,8 @@ const Header = () => {
                     to={item.path}
                     className={({ isActive }) =>
                       `text-[#E9DDAF] hover:text-[#E85D1F] transition-colors ${
-                    isActive ? "scale-110 text-[#E85D1F] transition-transform" : ""                      }`
+                        isActive ? "underline underline-offset-4" : ""
+                      }`
                     }
                   >
                     {item.name}
@@ -98,7 +99,7 @@ const Header = () => {
               <img
                 src={logo}
                 alt="Matessa Logo"
-                className="h-20 md:h-20 object-contain transition-transform duration-500 hover:scale-105"
+                className="h-20 md:h-23 object-contain transition-transform duration-500 hover:scale-105"
               />
             </Link>
           </div>
