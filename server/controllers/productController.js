@@ -44,14 +44,14 @@ const getFeaturedProducts = asyncHandler(async (req, res) => {
 // @route   POST /api/products
 // @access  Private/Admin
 const createProduct = asyncHandler(async (req, res) => {
-  const { name, price, description, image, brand, category, countInStock } =
+  const { name, price, description, images, brand, category, countInStock } =
     req.body;
 
   const product = new Product({
     name,
     price,
     user: req.user._id,
-    image,
+    images: images || [],
     brand,
     category,
     countInStock,
@@ -66,19 +66,19 @@ const createProduct = asyncHandler(async (req, res) => {
 // @route   PUT /api/products/:id
 // @access  Private/Admin
 const updateProduct = asyncHandler(async (req, res) => {
-  const { name, price, description, image, brand, category, countInStock } =
+  const { name, price, description, images, brand, category, countInStock } =
     req.body;
 
   const product = await Product.findById(req.params.id);
 
   if (product) {
-    product.name = name;
-    product.price = price;
-    product.description = description;
-    product.image = image;
-    product.brand = brand;
-    product.category = category;
-    product.countInStock = countInStock;
+    product.name = name || product.name;
+    product.price = price || product.price;
+    product.description = description || product.description;
+    product.images = images || product.images;
+    product.brand = brand || product.brand;
+    product.category = category || product.category;
+    product.countInStock = countInStock || product.countInStock;
 
     const updatedProduct = await product.save();
     res.json(updatedProduct);

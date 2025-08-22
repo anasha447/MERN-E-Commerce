@@ -28,6 +28,7 @@ const SingleProductPage = () => {
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [selectedVariant, setSelectedVariant] = useState(null);
+  const [mainImage, setMainImage] = useState("");
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
 
@@ -36,6 +37,9 @@ const SingleProductPage = () => {
     try {
       const data = await getProductById(id);
       setProduct(data);
+      if (data.images && data.images.length > 0) {
+        setMainImage(data.images[0]);
+      }
       if (data.variants && data.variants.length > 0) {
         setSelectedVariant(data.variants[0]);
       }
@@ -63,7 +67,7 @@ const SingleProductPage = () => {
     const itemToAdd = {
       id: product._id,
       name: product.name,
-      image: product.image,
+      image: product.images[0] || "", // Use the first image for cart
       price: selectedVariant ? selectedVariant.price : product.price,
       variant: selectedVariant ? selectedVariant.name : null,
     };
@@ -110,12 +114,28 @@ const SingleProductPage = () => {
     <div className="py-12 px-4 md:px-12">
       <div className="container mx-auto">
         <div className="flex flex-col md:flex-row items-start">
-          <div className="w-full md:w-1/2 flex justify-center">
-            <img
-              src={product.image}
-              alt={product.name}
-              className="rounded-xl shadow-lg max-h-[500px] object-cover"
-            />
+          <div className="w-full md:w-1/2 flex flex-col items-center">
+            <div className="w-full flex justify-center">
+              <img
+                src={mainImage}
+                alt={product.name}
+                className="rounded-xl shadow-lg max-h-[500px] object-cover"
+              />
+            </div>
+            <div className="flex space-x-2 mt-4">
+              {product.images &&
+                product.images.map((img, index) => (
+                  <img
+                    key={index}
+                    src={img}
+                    alt={`${product.name} thumbnail ${index + 1}`}
+                    className={`w-20 h-20 object-cover rounded-md cursor-pointer border-2 ${
+                      mainImage === img ? "border-[var(--color-orange)]" : "border-transparent"
+                    }`}
+                    onClick={() => setMainImage(img)}
+                  />
+                ))}
+            </div>
           </div>
 
           <div className="w-full md:w-1/2 mt-10 md:mt-0 md:pl-12">

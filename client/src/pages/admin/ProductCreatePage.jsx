@@ -11,13 +11,34 @@ const ProductCreatePage = () => {
   const { userInfo } = useContext(AuthContext);
   const [name, setName] = useState("");
   const [price, setPrice] = useState(0);
-  const [image, setImage] = useState("");
+  const [images, setImages] = useState([""]);
   const [brand, setBrand] = useState("");
   const [category, setCategory] = useState("");
   const [newCategory, setNewCategory] = useState("");
   const [categories, setCategories] = useState([]);
   const [countInStock, setCountInStock] = useState(0);
   const [description, setDescription] = useState("");
+
+  const handleImageChange = (index, value) => {
+    const newImages = [...images];
+    newImages[index] = value;
+    setImages(newImages);
+  };
+
+  const addImageInput = () => {
+    if (images.length < 5) {
+      setImages([...images, ""]);
+    } else {
+      toast.warn("You can add a maximum of 5 images.");
+    }
+  };
+
+  const removeImageInput = (index) => {
+    if (images.length > 1) {
+      const newImages = images.filter((_, i) => i !== index);
+      setImages(newImages);
+    }
+  };
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -54,7 +75,7 @@ const ProductCreatePage = () => {
         {
           name,
           price,
-          image,
+          images: images.filter(img => img), // Filter out empty strings
           brand,
           category: finalCategory,
           countInStock,
@@ -122,21 +143,38 @@ const ProductCreatePage = () => {
             />
           </div>
           <div className="mb-6">
-            <label
-              className="block text-[var(--color-darkgreen)] text-lg font-bold mb-2 font-heading"
-              htmlFor="image"
-            >
-              Image URL
+            <label className="block text-[var(--color-darkgreen)] text-lg font-bold mb-2 font-heading">
+              Image URLs (up to 5)
             </label>
-            <input
-              className="shadow-sm appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              id="image"
-              type="text"
-              placeholder="Enter image URL"
-              value={image}
-              onChange={(e) => setImage(e.target.value)}
-              required
-            />
+            {images.map((img, index) => (
+              <div key={index} className="flex items-center mb-2">
+                <input
+                  className="shadow-sm appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                  type="text"
+                  placeholder={`Image URL ${index + 1}`}
+                  value={img}
+                  onChange={(e) => handleImageChange(index, e.target.value)}
+                />
+                {images.length > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => removeImageInput(index)}
+                    className="ml-2 text-red-500 hover:text-red-700"
+                  >
+                    Remove
+                  </button>
+                )}
+              </div>
+            ))}
+            {images.length < 5 && (
+              <button
+                type="button"
+                onClick={addImageInput}
+                className="mt-2 text-sm text-[var(--color-orange)] hover:underline"
+              >
+                + Add Another Image
+              </button>
+            )}
           </div>
           <div className="mb-6">
             <label
