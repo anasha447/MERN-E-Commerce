@@ -6,6 +6,7 @@ import Spinner from "../components/Spinner";
 import { AuthContext } from "../context/AuthContext";
 import { toast } from "react-toastify";
 import { FaStar, FaRegStar } from "react-icons/fa";
+import Questions from "../components/questions";
 
 const StarRating = ({ rating }) => {
   const stars = [];
@@ -245,6 +246,7 @@ const SingleProductPage = () => {
             <p>Please <a href="/login" className="text-blue-500">sign in</a> to write a review.</p>
           )}
         </div>
+        <Questions />
       </div>
     </div>
   );
