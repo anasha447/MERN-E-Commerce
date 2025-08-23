@@ -7,15 +7,18 @@ import { AuthContext } from "../context/AuthContext";
 import { toast } from "react-toastify";
 import { FaStar, FaRegStar } from "react-icons/fa";
 import Questions from "../components/questions";
+import { imageUrl } from "../utils/imageUrl";
 
 const StarRating = ({ rating }) => {
   const stars = [];
   for (let i = 1; i <= 5; i++) {
-    if (i <= rating) {
-      stars.push(<FaStar key={i} className="text-yellow-500" />);
-    } else {
-      stars.push(<FaRegStar key={i} className="text-gray-400" />);
-    }
+    stars.push(
+      i <= rating ? (
+        <FaStar key={i} className="text-yellow-500" />
+      ) : (
+        <FaRegStar key={i} className="text-gray-400" />
+      )
+    );
   }
   return <div className="flex">{stars}</div>;
 };
@@ -33,11 +36,13 @@ const SingleProductPage = () => {
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState("");
 
+  // Fetch product
   const fetchProduct = useCallback(async () => {
     setLoading(true);
     try {
       const data = await getProductById(id);
       setProduct(data);
+
       if (data.images && data.images.length > 0) {
         setMainImage(data.images[0]);
       }
@@ -56,13 +61,14 @@ const SingleProductPage = () => {
     fetchProduct();
   }, [fetchProduct]);
 
+  // Add to cart
   const handleAddToCart = (openDrawer = true) => {
     if (!product) return;
 
     const itemToAdd = {
       id: product._id,
       name: product.name,
-      image: product.images[0] || "", // Use the first image for cart
+      image: product.images?.[0] || "",
       price: selectedVariant ? selectedVariant.price : product.price,
       variant: selectedVariant ? selectedVariant.name : null,
     };
@@ -70,10 +76,11 @@ const SingleProductPage = () => {
   };
 
   const handleBuyNow = () => {
-    handleAddToCart(false); // Add to cart without opening the drawer
+    handleAddToCart(false);
     navigate("/checkoutpage");
   };
 
+  // Submit review
   const handleReviewSubmit = async (e) => {
     e.preventDefault();
     if (!comment || rating === 0) {
@@ -81,27 +88,18 @@ const SingleProductPage = () => {
       return;
     }
     try {
-      await createProductReview(
-        id,
-        { rating, comment },
-        userInfo.token
-      );
+      await createProductReview(id, { rating, comment }, userInfo.token);
       toast.success("Review submitted successfully!");
       setRating(0);
       setComment("");
-      fetchProduct(); // Refresh product to show new review
+      fetchProduct();
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to submit review.");
     }
   };
 
-  if (loading) {
-    return <Spinner />;
-  }
-
-  if (!product) {
-    return <p className="text-center text-red-500">Product not found</p>;
-  }
+  if (loading) return <Spinner />;
+  if (!product) return <p className="text-center text-red-500">Product not found</p>;
 
   const displayPrice = selectedVariant ? selectedVariant.price : product.price;
 
@@ -109,36 +107,37 @@ const SingleProductPage = () => {
     <div className="py-12 px-4 md:px-12">
       <div className="container mx-auto">
         <div className="flex flex-col md:flex-row items-start">
+          {/* Images */}
           <div className="w-full md:w-1/2 flex flex-col items-center">
             {mainImage && (
               <>
                 <div className="w-full flex justify-center">
                   <img
-                    src={mainImage}
-                    alt={product.name}
+                    src={imageUrl(mainImage)}
+                    alt={product?.name || "Product"}
                     className="rounded-xl shadow-lg max-h-[500px] object-cover"
                   />
                 </div>
                 <div className="flex space-x-2 mt-4">
-                  {product.images &&
-                    product.images.map((img, index) => (
-                      <img
-                        key={index}
-                        src={img}
-                        alt={`${product.name} thumbnail ${index + 1}`}
-                        className={`w-20 h-20 object-cover rounded-md cursor-pointer border-2 ${
-                          mainImage === img
-                            ? "border-[var(--color-orange)]"
-                            : "border-transparent"
-                        }`}
-                        onClick={() => setMainImage(img)}
-                      />
-                    ))}
+                  {product?.images?.map((img, index) => (
+                    <img
+                      key={index}
+                      src={imageUrl(img)}
+                      alt={`${product?.name || "Product"} thumbnail ${index + 1}`}
+                      className={`w-20 h-20 object-cover rounded-md cursor-pointer border-2 ${
+                        mainImage === img
+                          ? "border-[var(--color-orange)]"
+                          : "border-transparent"
+                      }`}
+                      onClick={() => setMainImage(img)}
+                    />
+                  ))}
                 </div>
               </>
             )}
           </div>
 
+          {/* Product Details */}
           <div className="w-full md:w-1/2 mt-10 md:mt-0 md:pl-12">
             <h1 className="text-4xl font-bold [color:var(--color-darkgreen)]">
               {product.name}
@@ -151,6 +150,7 @@ const SingleProductPage = () => {
             </div>
             <p className="text-gray-700 mt-4">{product.description}</p>
 
+            {/* Variants */}
             {product.variants && product.variants.length > 0 && (
               <div className="mt-6">
                 <label className="block text-gray-800 mb-2 font-semibold">
@@ -178,6 +178,7 @@ const SingleProductPage = () => {
               ₹{displayPrice.toFixed(2)}
             </p>
 
+            {/* Actions */}
             <div className="mt-8 flex items-center space-x-4">
               <button
                 onClick={handleAddToCart}
@@ -195,6 +196,7 @@ const SingleProductPage = () => {
           </div>
         </div>
 
+        {/* Reviews */}
         <div className="mt-16 border-t pt-12">
           <h2 className="text-3xl font-bold mb-6">Reviews</h2>
           {product.reviews.length === 0 && <p>No reviews yet.</p>}
@@ -214,6 +216,7 @@ const SingleProductPage = () => {
           </div>
         </div>
 
+        {/* Review Form */}
         <div className="mt-12">
           <h2 className="text-3xl font-bold mb-6">Write a Customer Review</h2>
           {userInfo ? (
@@ -222,7 +225,7 @@ const SingleProductPage = () => {
                 <label className="block mb-2 font-semibold">Rating</label>
                 <select
                   value={rating}
-                  onChange={e => setRating(Number(e.target.value))}
+                  onChange={(e) => setRating(Number(e.target.value))}
                   className="w-full p-2 border rounded"
                 >
                   <option value="">Select...</option>
@@ -238,18 +241,28 @@ const SingleProductPage = () => {
                 <textarea
                   rows="4"
                   value={comment}
-                  onChange={e => setComment(e.target.value)}
+                  onChange={(e) => setComment(e.target.value)}
                   className="w-full p-2 border rounded"
                 ></textarea>
               </div>
-              <button type="submit" className="bg-[var(--color-orange)] text-white py-2 px-4 rounded hover:opacity-90">
+              <button
+                type="submit"
+                className="bg-[var(--color-orange)] text-white py-2 px-4 rounded hover:opacity-90"
+              >
                 Submit Review
               </button>
             </form>
           ) : (
-            <p>Please <a href="/login" className="text-blue-500">sign in</a> to write a review.</p>
+            <p>
+              Please{" "}
+              <a href="/login" className="text-blue-500">
+                sign in
+              </a>{" "}
+              to write a review.
+            </p>
           )}
         </div>
+
         <Questions />
       </div>
     </div>

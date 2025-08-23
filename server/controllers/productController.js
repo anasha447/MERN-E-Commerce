@@ -15,7 +15,6 @@ const getProducts = asyncHandler(async (req, res) => {
 // @access  Public
 const getProductById = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id);
-
   if (product) {
     res.json(product);
   } else {
@@ -44,11 +43,11 @@ const getFeaturedProducts = asyncHandler(async (req, res) => {
 // @route   POST /api/products
 // @access  Private/Admin
 const createProduct = asyncHandler(async (req, res) => {
-  const { name, price, description, images, brand, category, countInStock } =
-    req.body;
+  const { name, price, description, images, brand, category, countInStock } = req.body;
 
-  const processedImages = (images || []).map(img =>
-    img.startsWith('/public') ? img : `/public${img.startsWith('/') ? '' : '/'}${img}`
+  // Normalize to /images/*
+  const processedImages = (images || []).map((img) =>
+    img.startsWith("/images") ? img : `/images/${img.replace(/^\/+/, "")}`
   );
 
   const product = new Product({
@@ -70,31 +69,29 @@ const createProduct = asyncHandler(async (req, res) => {
 // @route   PUT /api/products/:id
 // @access  Private/Admin
 const updateProduct = asyncHandler(async (req, res) => {
-  const { name, price, description, images, brand, category, countInStock } =
-    req.body;
-
+  const { name, price, description, images, brand, category, countInStock } = req.body;
   const product = await Product.findById(req.params.id);
 
-  if (product) {
-    product.name = name || product.name;
-    product.price = price || product.price;
-    product.description = description || product.description;
-    product.brand = brand || product.brand;
-    product.category = category || product.category;
-    product.countInStock = countInStock ?? product.countInStock;
-
-    if (images) {
-      product.images = images.map(img =>
-        img.startsWith('/public') ? img : `/public${img.startsWith('/') ? '' : '/'}${img}`
-      );
-    }
-
-    const updatedProduct = await product.save();
-    res.json(updatedProduct);
-  } else {
+  if (!product) {
     res.status(404);
     throw new Error("Product not found");
   }
+
+  product.name = name || product.name;
+  product.price = price || product.price;
+  product.description = description || product.description;
+  product.brand = brand || product.brand;
+  product.category = category || product.category;
+  product.countInStock = countInStock ?? product.countInStock;
+
+  if (images) {
+    product.images = images.map((img) =>
+      img.startsWith("/images") ? img : `/images/${img.replace(/^\/+/, "")}`
+    );
+  }
+
+  const updatedProduct = await product.save();
+  res.json(updatedProduct);
 });
 
 // @desc    Delete a product
@@ -102,7 +99,6 @@ const updateProduct = asyncHandler(async (req, res) => {
 // @access  Private/Admin
 const deleteProduct = asyncHandler(async (req, res) => {
   const product = await Product.findById(req.params.id);
-
   if (product) {
     await product.remove();
     res.json({ message: "Product removed" });
@@ -117,52 +113,46 @@ const deleteProduct = asyncHandler(async (req, res) => {
 // @access  Private
 const createProductReview = asyncHandler(async (req, res) => {
   const { rating, comment } = req.body;
-
   const product = await Product.findById(req.params.id);
 
-  if (product) {
-    const alreadyReviewed = product.reviews.find(
-      (r) => r.user.toString() === req.user._id.toString()
-    );
-
-    if (alreadyReviewed) {
-      res.status(400);
-      throw new Error("Product already reviewed");
-    }
-
-    // Check if user has purchased the item
-    const deliveredOrders = await Order.find({
-      user: req.user._id,
-      "orderItems.product": product._id,
-      status: "Delivered",
-    });
-
-    if (deliveredOrders.length === 0) {
-      res.status(400);
-      throw new Error("You can only review products you have received");
-    }
-
-    const review = {
-      name: req.user.name,
-      rating: Number(rating),
-      comment,
-      user: req.user._id,
-    };
-
-    product.reviews.push(review);
-
-    product.numReviews = product.reviews.length;
-
-    product.rating =
-      product.reviews.reduce((acc, item) => item.rating + acc, 0) /
-      product.reviews.length;
-
-    await product.save();
-    res.status(201).json({ message: "Review added" });
-  } else {
+  if (!product) {
     res.status(404);
     throw new Error("Product not found");
   }
+
+  const alreadyReviewed = product.reviews.find(
+    (r) => r.user.toString() === req.user._id.toString()
+  );
+  if (alreadyReviewed) {
+    res.status(400);
+    throw new Error("Product already reviewed");
+  }
+
+  // Ensure user has received the item
+  const deliveredOrders = await Order.find({
+    user: req.user._id,
+    "orderItems.product": product._id,
+    status: "Delivered",
+  });
+  if (deliveredOrders.length === 0) {
+    res.status(400);
+    throw new Error("You can only review products you have received");
+  }
+
+  const review = {
+    name: req.user.name,
+    rating: Number(rating),
+    comment,
+    user: req.user._id,
+  };
+
+  product.reviews.push(review);
+  product.numReviews = product.reviews.length;
+  product.rating =
+    product.reviews.reduce((acc, item) => item.rating + acc, 0) / product.reviews.length;
+
+  await product.save();
+  res.status(201).json({ message: "Review added" });
 });
 
 export {
