@@ -3,6 +3,7 @@ import { useCart } from "../context/cart-context";
 import { getProducts } from "../apis/product.api"; // API function
 import { useNavigate } from "react-router-dom";
 import ShopBanner from "../components/banner-shop"; // Example banner image
+import { getImageUrl } from "../utils/imageUrl.js";
 const ShopPage = ({ selectedCategory }) => {
   const { addToCart } = useCart();
   const [products, setProducts] = useState([]);
@@ -55,7 +56,7 @@ const ShopPage = ({ selectedCategory }) => {
               onClick={() => navigate(`/product/${product._id}`)}
             >
               <img
-                src={product.image}
+                src={getImageUrl(product.images[0])}
                 alt={product.name}
                 className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110"
               />
@@ -80,7 +81,15 @@ const ShopPage = ({ selectedCategory }) => {
             {/* Add to Cart separate */}
             <div className="p-4 flex justify-center">
               <button
-                onClick={() => addToCart(product, 1)}
+                onClick={() =>
+                  addToCart({
+                    id: product._id,
+                    name: product.name,
+                    price: product.price,
+                    image: product.images[0] || "",
+                    variant: "default",
+                  })
+                }
                 className="bg-lightgreen text-white px-6 py-3 rounded-md font-semibold hover:bg-darkgreen cursor-pointer transition duration-300"
               >
                 Add to Cart

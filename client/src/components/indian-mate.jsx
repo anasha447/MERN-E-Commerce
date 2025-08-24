@@ -1,9 +1,9 @@
 // src/components/IndianMateStory.jsx
 import { motion } from "framer-motion";
 import { Sparkles } from "lucide-react";
-import carda from "../assets/noideaa.png";
-import cloves from "../assets/blackpa.png";
-import cinnamon from "../assets/blackpa.png";
+import carda from "../assets/noidea.png";
+import cloves from "../assets/star.png";
+import cinnamon from "../assets/blackp.png";
 import indianmate from "../assets/matecup.png";
 
 export default function IndianMateStory() {
@@ -36,7 +36,7 @@ export default function IndianMateStory() {
             <motion.img 
               src= {cloves}
               alt="Cardamom" 
-              className="absolute top-0 right-0 w-15"
+              className="absolute top-0 right-0 w-10"
               animate={{ y: [0, 12, 0] }}
               transition={{ repeat: Infinity, duration: 3 }}
             />
