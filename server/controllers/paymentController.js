@@ -2,7 +2,7 @@ import Razorpay from "razorpay";
 import crypto from "crypto";
 import Order from "../models/orderModel.js";
 
-// ✅ Only create Razorpay instance if keys are present
+// ✅ Create Razorpay instance only if keys exist
 let instance = null;
 if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
   instance = new Razorpay({
@@ -15,7 +15,7 @@ if (process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
 const createRazorpayOrder = async (req, res) => {
   try {
     const { orderId } = req.body;
-    const order = await Order.findById(orderId);
+    const order = await Order.findById(orderId).populate("orderItems.product", "name imageUrl");
 
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
@@ -29,6 +29,15 @@ const createRazorpayOrder = async (req, res) => {
         amount: order.totalPrice * 100,
         status: "created (placeholder)",
         message: "Razorpay not configured yet. Using placeholder response.",
+        orderDetails: {
+          id: order._id,
+          items: order.orderItems.map(item => ({
+            name: item.product.name,
+            imageUrl: item.product.imageUrl,
+            qty: item.qty,
+            price: item.price,
+          })),
+        },
       });
     }
 
@@ -48,7 +57,18 @@ const createRazorpayOrder = async (req, res) => {
     order.paymentResult = { razorpay_order_id: razorpayOrder.id };
     await order.save();
 
-    res.json(razorpayOrder);
+    res.json({
+      ...razorpayOrder,
+      orderDetails: {
+        id: order._id,
+        items: order.orderItems.map(item => ({
+          name: item.product.name,
+          imageUrl: item.product.imageUrl,
+          qty: item.qty,
+          price: item.price,
+        })),
+      },
+    });
   } catch (error) {
     console.error("Error creating Razorpay order:", error);
     res.status(500).json({ message: "Server error creating Razorpay order" });
@@ -63,7 +83,7 @@ const verifyRazorpayPayment = async (req, res) => {
 
     // ✅ If Razorpay not configured, just mark as paid (mock)
     if (!instance) {
-      const order = await Order.findById(orderId);
+      const order = await Order.findById(orderId).populate("orderItems.product", "name imageUrl");
       if (order) {
         order.isPaid = true;
         order.paidAt = Date.now();
@@ -80,12 +100,21 @@ const verifyRazorpayPayment = async (req, res) => {
         return res.json({
           message: "Payment successful (placeholder mode)",
           orderId: order._id,
+          orderDetails: {
+            id: order._id,
+            items: order.orderItems.map(item => ({
+              name: item.product.name,
+              imageUrl: item.product.imageUrl,
+              qty: item.qty,
+              price: item.price,
+            })),
+          },
         });
       }
       return res.status(404).json({ message: "Order not found" });
     }
 
-    // ✅ Normal Razorpay verification if configured
+    // ✅ Normal Razorpay verification
     const body = razorpay_order_id + "|" + razorpay_payment_id;
 
     const expectedSignature = crypto
@@ -95,7 +124,7 @@ const verifyRazorpayPayment = async (req, res) => {
 
     const isAuthentic = expectedSignature === razorpay_signature;
 
-    const order = await Order.findById(orderId);
+    const order = await Order.findById(orderId).populate("orderItems.product", "name imageUrl");
     if (!order) {
       return res.status(404).json({ message: "Order not found" });
     }
@@ -115,7 +144,19 @@ const verifyRazorpayPayment = async (req, res) => {
       };
       await order.save();
 
-      res.json({ message: "Payment successful", orderId: order._id });
+      res.json({
+        message: "Payment successful",
+        orderId: order._id,
+        orderDetails: {
+          id: order._id,
+          items: order.orderItems.map(item => ({
+            name: item.product.name,
+            imageUrl: item.product.imageUrl,
+            qty: item.qty,
+            price: item.price,
+          })),
+        },
+      });
     } else {
       res.status(400).json({ message: "Invalid signature" });
     }

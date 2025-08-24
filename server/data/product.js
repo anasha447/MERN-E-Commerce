@@ -9,7 +9,6 @@ const products = [
     price: 350,
     countInStock: 20,
     isFeatured: true // ✅ mark as featured
-
   },
   {
     name: "Yerba Mate Ginger-Lemon",
@@ -19,8 +18,7 @@ const products = [
     category: "Mate",
     price: 370,
     countInStock: 18,
-    isFeatured: true// ✅ mark as featured
-
+    isFeatured: true
   },
   {
     name: "Yerba Mate Tulsi-Mint",
@@ -30,8 +28,7 @@ const products = [
     category: "Mate",
     price: 360,
     countInStock: 15,
-    isFeatured: true // ✅ mark as featured
-
+    isFeatured: true
   },
   {
     name: "Berry Bliss Mate",

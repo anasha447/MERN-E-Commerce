@@ -28,10 +28,9 @@ const FeaturedProducts = () => {
         id: product._id,
         name: product.name,
         price: product.price,
+ fix-product-image-fetching
         image: getImageUrl(product.images[0]) || "",
-        variant: "default",
-      },
-      1
+
     );
   };
 
