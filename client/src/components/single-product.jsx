@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { getImageUrl } from "../utils/imageUrl";
 
 export default function SingleProduct({ product }) {
   const navigate = useNavigate();
@@ -20,7 +21,7 @@ export default function SingleProduct({ product }) {
         {/* Product Image */}
         <div className="flex justify-center">
           <img
-            src={product.image}
+            src={getImageUrl(product.images[0])}
             alt={product.name}
             className="w-full max-w-sm rounded-xl shadow-md"
           />
