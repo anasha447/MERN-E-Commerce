@@ -47,9 +47,10 @@ const createProduct = asyncHandler(async (req, res) => {
   const { name, price, description, images, brand, category, countInStock } =
     req.body;
 
-  const processedImages = (images || []).map(img =>
-    img.startsWith('/public') ? img : `/public${img.startsWith('/') ? '' : '/'}${img}`
-  );
+  const processedImages = (images || []).map(img => {
+    let cleanPath = img.replace(/^\/public/, '').replace(/^\/images/, '').replace(/^\//, '');
+    return `/images/${cleanPath}`;
+  });
 
   const product = new Product({
     name,
@@ -84,9 +85,10 @@ const updateProduct = asyncHandler(async (req, res) => {
     product.countInStock = countInStock ?? product.countInStock;
 
     if (images) {
-      product.images = images.map(img =>
-        img.startsWith('/public') ? img : `/public${img.startsWith('/') ? '' : '/'}${img}`
-      );
+      product.images = images.map(img => {
+        let cleanPath = img.replace(/^\/public/, '').replace(/^\/images/, '').replace(/^\//, '');
+        return `/images/${cleanPath}`;
+      });
     }
 
     const updatedProduct = await product.save();
