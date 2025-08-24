@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getFeaturedProducts } from "../apis/product.api.js";
 import { useCart } from "../context/cart-context";
 import { useNavigate } from "react-router-dom";
+import { getImageUrl } from "../utils/imageUrl.js";
 
 const FeaturedProducts = () => {
   const [products, setProducts] = useState([]);
@@ -27,7 +28,7 @@ const FeaturedProducts = () => {
         id: product._id,
         name: product.name,
         price: product.price,
-        image: product.image,
+        image: product.images[0] || "",
         variant: "default",
       },
       1
@@ -93,7 +94,7 @@ const FeaturedProducts = () => {
                   onClick={() => navigate(`/product/${product._id}`)}
                 >
                   <img
-                    src={product.image}
+                    src={getImageUrl(product.images[0])}
                     alt={product.name}
                     className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110"
                   />

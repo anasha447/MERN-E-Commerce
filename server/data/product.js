@@ -2,37 +2,40 @@
 const products = [
   {
     name: "Yerba Mate Masala",
-    images: ["/images/masala.png"], // ✅ array
+    image: "/images/masala.png",
     description: "Rich and spicy yerba mate blend.",
     brand: "Matessa",
     category: "Mate",
     price: 350,
     countInStock: 20,
-    isFeatured: true,
+    isFeatured: true // ✅ mark as featured
+
   },
   {
     name: "Yerba Mate Ginger-Lemon",
-    images: ["/images/lemon.png"], // ✅ array
+    image: "/images/lemon.png",
     description: "Refreshing ginger and lemon infusion.",
     brand: "Matessa",
     category: "Mate",
     price: 370,
     countInStock: 18,
-    isFeatured: true,
+    isFeatured: true// ✅ mark as featured
+
   },
   {
     name: "Yerba Mate Tulsi-Mint",
-    images: ["/images/tulsi.png"], // ✅ array
+    image: "/images/tulsi.png",
     description: "Cooling mint and tulsi herbal mix.",
     brand: "Matessa",
     category: "Mate",
     price: 360,
     countInStock: 15,
-    isFeatured: true,
+    isFeatured: true // ✅ mark as featured
+
   },
   {
     name: "Berry Bliss Mate",
-    images: ["/images/berry.png"],
+    image: "/images/berry.png",
     description: "Fruity berry flavors with energizing mate.",
     brand: "Matessa",
     category: "Mate",
@@ -41,7 +44,7 @@ const products = [
   },
   {
     name: "Mint Breeze Mate",
-    images: ["/images/mint.png"],
+    image: "/images/mint.png",
     description: "Fresh mint leaves blended with yerba mate.",
     brand: "Matessa",
     category: "Mate",
@@ -50,7 +53,7 @@ const products = [
   },
   {
     name: "Chai Spice Mate",
-    images: ["/images/chai.png"],
+    image: "/images/chai.png",
     description: "Aromatic chai spices with a mate twist.",
     brand: "Matessa",
     category: "Mate",
@@ -59,7 +62,7 @@ const products = [
   },
   {
     name: "Citrus Zest Mate",
-    images: ["/images/citrus.png"],
+    image: "/images/citrus.png",
     description: "Citrusy tang with smooth yerba mate.",
     brand: "Matessa",
     category: "Mate",
@@ -68,7 +71,7 @@ const products = [
   },
   {
     name: "Mate Cup Accessory",
-    images: ["/images/matecup.png"],
+    image: "/images/matecup.png",
     description: "Traditional mate gourd cup with straw.",
     brand: "Matessa",
     category: "Accessories",
