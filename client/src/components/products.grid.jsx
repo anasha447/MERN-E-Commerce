@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useCart } from "../context/cart-context";
 import { getProducts } from "../apis/product.api";
+import { getImageUrl } from "../utils/imageUrl";
 
 const ProductGrid = ({ selectedCategory }) => {
   const { addToCart } = useCart();
@@ -47,7 +48,7 @@ const ProductGrid = ({ selectedCategory }) => {
             {/* Product Image */}
             <div className="relative overflow-hidden">
               <img
-                src={product.image}
+                src={getImageUrl(product.images[0])}
                 alt={product.name}
                 className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110"
               />

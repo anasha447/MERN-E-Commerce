@@ -63,7 +63,7 @@ const SingleProductPage = () => {
     const itemToAdd = {
       id: product._id,
       name: product.name,
-      image: product.images[0] || "", // Use the first image for cart
+      image: getImageUrl(product.images[0]) || "", // Use the first image for cart
       price: selectedVariant ? selectedVariant.price : product.price,
       variant: selectedVariant ? selectedVariant.name : null,
     };

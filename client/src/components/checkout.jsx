@@ -1,5 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { getImageUrl } from "../utils/imageUrl";
 
 export default function Checkout() {
   const location = useLocation();
@@ -27,7 +28,7 @@ export default function Checkout() {
         {/* Product summary */}
         <div className="flex items-center gap-6 border-b pb-4 mb-6">
           <img
-            src={product.image}
+            src={getImageUrl(product.images[0])}
             alt={product.name}
             className="w-24 h-24 object-cover rounded-lg"
           />

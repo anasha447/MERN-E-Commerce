@@ -28,7 +28,7 @@ const FeaturedProducts = () => {
         id: product._id,
         name: product.name,
         price: product.price,
-        image: product.images[0] || "",
+        image: getImageUrl(product.images[0]) || "",
         variant: "default",
       },
       1
