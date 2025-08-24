@@ -44,7 +44,7 @@ const getFeaturedProducts = asyncHandler(async (req, res) => {
 // @route   POST /api/products
 // @access  Private/Admin
 const createProduct = asyncHandler(async (req, res) => {
-  const { name, price, description, images, brand, category, countInStock } =
+  const { name, price, description, images, brand, category, countInStock, variants } =
     req.body;
 
   const processedImages = (images || []).map(img => {
@@ -61,6 +61,7 @@ const createProduct = asyncHandler(async (req, res) => {
     category,
     countInStock,
     description,
+    variants: variants || [],
   });
 
   const createdProduct = await product.save();
@@ -71,18 +72,19 @@ const createProduct = asyncHandler(async (req, res) => {
 // @route   PUT /api/products/:id
 // @access  Private/Admin
 const updateProduct = asyncHandler(async (req, res) => {
-  const { name, price, description, images, brand, category, countInStock } =
+  const { name, price, description, images, brand, category, countInStock, variants } =
     req.body;
 
   const product = await Product.findById(req.params.id);
 
   if (product) {
-    product.name = name || product.name;
-    product.price = price || product.price;
-    product.description = description || product.description;
-    product.brand = brand || product.brand;
-    product.category = category || product.category;
+    product.name = name ?? product.name;
+    product.price = price ?? product.price;
+    product.description = description ?? product.description;
+    product.brand = brand ?? product.brand;
+    product.category = category ?? product.category;
     product.countInStock = countInStock ?? product.countInStock;
+    product.variants = variants ?? product.variants;
 
     if (images) {
       product.images = images.map(img => {
