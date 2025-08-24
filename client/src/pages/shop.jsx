@@ -86,7 +86,10 @@ const ShopPage = ({ selectedCategory }) => {
                     id: product._id,
                     name: product.name,
                     price: product.price,
-                    image: product.images[0] || "",
+ fix-product-image-fetching
+                    image: getImageUrl(product.images[0]) || "",
+
+                  
                     variant: "default",
                   })
                 }

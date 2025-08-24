@@ -1,41 +1,80 @@
-import path from "path";
-import express from "express";
-import dotenv from "dotenv";
-import cors from "cors";
-import connectDB from "./config/db.js";
-import productRoutes from "./routes/productRoutes.js";
-import userRoutes from "./routes/userRoutes.js";
-import orderRoutes from "./routes/orderRoutes.js";
-import adminRoutes from "./routes/adminRoutes.js";
-import paymentRoutes from "./routes/paymentRoutes.js";
-import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
+// ✅ Product Data (using images from public/images)
+const products = [
+  {
+    name: "Yerba Mate Masala",
+    images: ["/images/masala.png"],
+    description: "Rich and spicy yerba mate blend.",
+    brand: "Matessa",
+    category: "Mate",
+    price: 350,
+    countInStock: 20,
+    isFeatured: true // ✅ mark as featured
+  },
+  {
+    name: "Yerba Mate Ginger-Lemon",
+    images: ["/images/lemon.png"],
+    description: "Refreshing ginger and lemon infusion.",
+    brand: "Matessa",
+    category: "Mate",
+    price: 370,
+    countInStock: 18,
+    isFeatured: true
+  },
+  {
+    name: "Yerba Mate Tulsi-Mint",
+    images: ["/images/tulsi.png"],
+    description: "Cooling mint and tulsi herbal mix.",
+    brand: "Matessa",
+    category: "Mate",
+    price: 360,
+    countInStock: 15,
+    isFeatured: true
+  },
+  {
+    name: "Berry Bliss Mate",
+    images: ["/images/berry.png"],
+    description: "Fruity berry flavors with energizing mate.",
+    brand: "Matessa",
+    category: "Mate",
+    price: 380,
+    countInStock: 12,
+  },
+  {
+    name: "Mint Breeze Mate",
+    images: ["/images/mint.png"],
+    description: "Fresh mint leaves blended with yerba mate.",
+    brand: "Matessa",
+    category: "Mate",
+    price: 340,
+    countInStock: 22,
+  },
+  {
+    name: "Chai Spice Mate",
+    images: ["/images/chai.png"],
+    description: "Aromatic chai spices with a mate twist.",
+    brand: "Matessa",
+    category: "Mate",
+    price: 390,
+    countInStock: 10,
+  },
+  {
+    name: "Citrus Zest Mate",
+    images: ["/images/citrus.png"],
+    description: "Citrusy tang with smooth yerba mate.",
+    brand: "Matessa",
+    category: "Mate",
+    price: 375,
+    countInStock: 16,
+  },
+  {
+    name: "Mate Cup Accessory",
+    images: ["/images/matecup.png"],
+    description: "Traditional mate gourd cup with straw.",
+    brand: "Matessa",
+    category: "Accessories",
+    price: 450,
+    countInStock: 8,
+  },
+];
 
-dotenv.config();
-connectDB();
-
-const app = express();
-app.use(cors());
-app.use(express.json());
-
-// Serve static files
-const __dirname = path.resolve();
-app.use("/public", express.static(path.join(__dirname, "/client/public")));
-
-
-// Routes
-app.use("/api/products", productRoutes);
-app.use("/api/users", userRoutes);
-app.use("/api/orders", orderRoutes);
-app.use("/api/admin", adminRoutes);
-app.use("/api/payment", paymentRoutes);
-
-app.get("/", (req, res) => {
-  res.send("API is running...");
-});
-
-// Error Handling Middleware
-app.use(notFound);
-app.use(errorHandler);
-
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+export default products;
