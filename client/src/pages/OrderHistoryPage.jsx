@@ -2,6 +2,9 @@ import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import { Link } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import Spinner from "../components/Spinner";
+
+const API_URL = "http://localhost:5000/api";
 
 const OrderHistoryPage = () => {
   const { userInfo } = useContext(AuthContext);
@@ -10,13 +13,17 @@ const OrderHistoryPage = () => {
 
   useEffect(() => {
     const fetchOrders = async () => {
+      if (!userInfo) {
+        setLoading(false);
+        return;
+      }
       try {
         const config = {
           headers: {
             Authorization: `Bearer ${userInfo.token}`,
           },
         };
-        const { data } = await axios.get("/api/orders/myorders", config);
+        const { data } = await axios.get(`${API_URL}/orders/myorders`, config);
         setOrders(data);
         setLoading(false);
       } catch (error) {
@@ -24,89 +31,89 @@ const OrderHistoryPage = () => {
         setLoading(false);
       }
     };
-    if (userInfo) {
-      fetchOrders();
-    }
+    fetchOrders();
   }, [userInfo]);
 
   return (
-    <div className="container mx-auto py-12">
-      <h1 className="text-3xl font-bold mb-8">My Orders</h1>
+    <div className="container mx-auto py-12 px-4 md:px-12 bg-[var(--color-white)]">
+      <h1 className="text-4xl font-bold text-center mb-12 text-[var(--color-darkgreen)] font-heading">
+        My Orders
+      </h1>
       {loading ? (
-        <div>Loading...</div>
-      ) : orders.length === 0 ? (
-        <div>You have no orders.</div>
+        <Spinner />
+      ) : !Array.isArray(orders) || orders.length === 0 ? (
+        <div className="text-center text-gray-500">
+          You have no orders.{" "}
+          <Link to="/shop" className="text-[var(--color-orange)] hover:underline">
+            Start Shopping
+          </Link>
+        </div>
       ) : (
-        <div className="bg-white shadow-md rounded-lg">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+        <div className="bg-white shadow-lg rounded-lg overflow-hidden">
+          <table className="min-w-full">
+            <thead className="bg-[var(--color-darkgreen)] text-[var(--color-craemy)]">
               <tr>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  ID
+                <th className="py-3 px-6 text-left font-heading">ID</th>
+                <th className="py-3 px-6 text-left font-heading">Date</th>
+                <th className="py-3 px-6 text-left font-heading">Total</th>
+                <th className="py-3 px-6 text-left font-heading">Paid</th>
+                <th className="py-3 px-6 text-left font-heading">Delivered</th>
+                <th className="py-3 px-6 text-left font-heading">
+                  Payment Method
                 </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Date
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Total
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Paid
-                </th>
-                <th
-                  scope="col"
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                >
-                  Delivered
-                </th>
-                <th scope="col" className="relative px-6 py-3">
-                  <span className="sr-only">Details</span>
-                </th>
+                <th className="py-3 px-6 text-left font-heading"></th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="divide-y divide-gray-200">
               {orders.map((order) => (
-                <tr key={order._id}>
-                  <td className="px-6 py-4 whitespace-nowrap">{order._id}</td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {order.createdAt.substring(0, 10)}
+                <tr key={order._id} className="hover:bg-gray-50">
+                  <td className="py-4 px-6 whitespace-nowrap">{order._id}</td>
+                  <td className="py-4 px-6 whitespace-nowrap">
+                    {new Date(order.createdAt).toLocaleDateString()}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    ${order.totalPrice}
+                  <td className="py-4 px-6 whitespace-nowrap">
+                    ${order.totalPrice.toFixed(2)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="py-4 px-6 whitespace-nowrap">
                     {order.isPaid ? (
-                      order.paidAt.substring(0, 10)
+                      <span className="text-green-500 font-bold">Yes</span>
                     ) : (
-                      <span className="text-red-500">No</span>
+                      <span className="text-red-500 font-bold">No</span>
                     )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
+                  <td className="py-4 px-6 whitespace-nowrap">
                     {order.isDelivered ? (
-                      order.deliveredAt.substring(0, 10)
+                      <span className="text-green-500 font-bold">Yes</span>
                     ) : (
-                      <span className="text-red-500">No</span>
+                      <span className="text-red-500 font-bold">No</span>
                     )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                    <Link
-                      to={`/order/${order._id}`}
-                      className="text-indigo-600 hover:text-indigo-900"
-                    >
-                      Details
-                    </Link>
+                  <td className="py-4 px-6 whitespace-nowrap">
+                    {order.paymentMethod}
+                  </td>
+                  <td className="py-4 px-6 whitespace-nowrap text-right">
+                    <div className="flex flex-col items-end">
+                      <Link
+                        to={`/order/${order._id}`}
+                        className="text-[var(--color-green)] hover:text-[var(--color-lightgreen)] font-bold mb-2"
+                      >
+                        View Details
+                      </Link>
+                      {order.status === "Delivered" && (
+                        <div className="mt-2">
+                          <h4 className="font-semibold text-sm">Rate Products:</h4>
+                          {order.orderItems.map((item) => (
+                            <Link
+                              key={item.product}
+                              to={`/product/${item.product}`}
+                              className="block text-xs text-blue-500 hover:underline"
+                            >
+                              {item.name}
+                            </Link>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </td>
                 </tr>
               ))}

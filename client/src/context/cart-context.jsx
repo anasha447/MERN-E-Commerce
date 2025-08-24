@@ -4,24 +4,26 @@ import React, {
   useEffect,
   useMemo,
   useReducer,
+  useRef,
+  useState,
 } from "react";
+import axios from "axios";
+import { toast } from "react-toastify";
+import { AuthContext } from "./AuthContext";
 
-/* ================================
-   Constants & Helpers
-================================ */
+const API_URL = "http://localhost:5000/api";
 const STORAGE_KEY = "cart_v1";
+
 const keyFrom = (product) => `${product.id}__${product.variant || "default"}`;
 
-/* ================================
-   Reducer
-================================ */
 function cartReducer(state, action) {
   switch (action.type) {
+    case "SET_CART":
+      return { ...state, items: action.payload.items, alert: null };
     case "ADD": {
       const { product, qty } = action.payload;
       const key = keyFrom(product);
       const existing = state.items.find((item) => item.key === key);
-
       let updatedItems;
       if (existing) {
         updatedItems = state.items.map((item) =>
@@ -30,124 +32,157 @@ function cartReducer(state, action) {
       } else {
         updatedItems = [...state.items, { key, ...product, qty }];
       }
-
       return {
         ...state,
         items: updatedItems,
-        alert: `✅ ${product.name} added to cart!`,
+        alert: { type: "success", message: `✅ ${product.name} added to cart!` },
       };
     }
-
     case "SET_QTY": {
       const { key, qty } = action.payload;
       return {
         ...state,
         items: state.items
-          .map((item) =>
-            item.key === key ? { ...item, qty: Math.max(1, qty) } : item
-          )
+          .map((item) => (item.key === key ? { ...item, qty: Math.max(1, qty) } : item))
           .filter((item) => item.qty > 0),
       };
     }
-
     case "REMOVE":
       return {
         ...state,
         items: state.items.filter((item) => item.key !== action.payload.key),
-        alert: "❌ Item removed from cart.",
+        alert: { type: "error", message: "❌ Item removed from cart." },
       };
-
     case "CLEAR":
-      return { ...state, items: [], alert: "🛒 Cart cleared." };
-
+      return { ...state, items: [], alert: { type: "info", message: "🛒 Cart cleared." } };
     case "CLEAR_ALERT":
       return { ...state, alert: null };
-
     default:
       return state;
   }
 }
 
-/* ================================
-   Initial State Loader
-================================ */
 function initCart() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    return raw ? JSON.parse(raw) : { items: [], alert: null };
+    const parsed = raw ? JSON.parse(raw) : { items: [], alert: null };
+    return { ...parsed, alert: null }; // Ensure alert is always null on init
   } catch {
     return { items: [], alert: null };
   }
 }
 
-/* ================================
-   Context Setup
-================================ */
 const CartContext = createContext(null);
 
 export function CartProvider({ children }) {
   const [state, dispatch] = useReducer(cartReducer, undefined, initCart);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const authCtx = useContext(AuthContext);
+  const isInitialMount = useRef(true);
 
-  /* Persist cart to localStorage */
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-  }, [state]);
-
-  /* Auto-clear alert after 1.5s */
+  // Effect for showing toast notifications
   useEffect(() => {
     if (state.alert) {
-      const timer = setTimeout(() => {
-        dispatch({ type: "CLEAR_ALERT" });
-      }, 1500);
-      return () => clearTimeout(timer);
+      toast[state.alert.type](state.alert.message);
+      dispatch({ type: "CLEAR_ALERT" });
     }
   }, [state.alert]);
 
-  /* Derived Values */
+  // Effect for syncing cart
+  useEffect(() => {
+    if (isInitialMount.current) {
+      isInitialMount.current = false;
+      return;
+    }
+    const userInfo = authCtx ? authCtx.userInfo : null;
+    const syncCart = async () => {
+      if (userInfo && !userInfo.isAdmin) {
+        try {
+          const config = { headers: { Authorization: `Bearer ${userInfo.token}` } };
+          await axios.post(`${API_URL}/users/cart`, { cart: state.items }, config);
+        } catch (error) {
+          console.error("Failed to sync cart to DB:", error);
+        }
+      } else {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ items: state.items }));
+      }
+    };
+    syncCart();
+  }, [state.items, authCtx]);
+
   const { itemCount, subtotal } = useMemo(() => {
     const itemCount = state.items.reduce((total, item) => total + item.qty, 0);
-    const subtotal = state.items.reduce(
-      (sum, item) => sum + item.price * item.qty,
-      0
-    );
+    const subtotal = state.items.reduce((sum, item) => sum + item.price * item.qty, 0);
     return { itemCount, subtotal };
   }, [state.items]);
 
-  /* Actions */
-  const addToCart = (product, qty = 1) =>
+  const mergeCarts = async (token) => {
+    try {
+      const guestCartRaw = localStorage.getItem(STORAGE_KEY);
+      const guestCart = guestCartRaw ? JSON.parse(guestCartRaw).items : [];
+      if (guestCart.length === 0) return;
+
+      const config = { headers: { Authorization: `Bearer ${token}` } };
+      const { data: dbCart } = await axios.get(`${API_URL}/users/cart`, config);
+
+      const mergedCartMap = new Map();
+      dbCart.forEach(item => mergedCartMap.set(item.key, item));
+      guestCart.forEach(guestItem => {
+        if (mergedCartMap.has(guestItem.key)) {
+          mergedCartMap.get(guestItem.key).qty += guestItem.qty;
+        } else {
+          mergedCartMap.set(guestItem.key, guestItem);
+        }
+      });
+      const mergedCart = Array.from(mergedCartMap.values());
+
+      await axios.post(`${API_URL}/users/cart`, { cart: mergedCart }, config);
+      dispatch({ type: "SET_CART", payload: { items: mergedCart } });
+
+      toast.info("Your guest cart items have been merged with your account cart.");
+      localStorage.removeItem(STORAGE_KEY);
+
+    } catch (error) {
+      console.error("Failed to merge carts:", error);
+      toast.error("Could not merge carts.");
+    }
+  };
+
+  const openCart = () => setIsCartOpen(true);
+  const closeCart = () => setIsCartOpen(false);
+
+  const addToCart = (product, qty = 1, options = { openDrawer: true }) => {
     dispatch({ type: "ADD", payload: { product, qty } });
-
-  const setQty = (key, qty) =>
-    dispatch({ type: "SET_QTY", payload: { key, qty } });
-
-  const removeFromCart = (key) =>
-    dispatch({ type: "REMOVE", payload: { key } });
-
+    if (options.openDrawer) {
+      openCart();
+    }
+  };
+  const setQty = (key, qty) => dispatch({ type: "SET_QTY", payload: { key, qty } });
+  const removeFromCart = (key) => dispatch({ type: "REMOVE", payload: { key } });
   const clearCart = () => dispatch({ type: "CLEAR" });
 
-  /* Context Value */
   const value = {
     items: state.items,
     itemCount,
     subtotal,
-    alert: state.alert, // 👈 now available
+    isCartOpen,
+    openCart,
+    closeCart,
     addToCart,
     setQty,
     removeFromCart,
     clearCart,
+    mergeCarts,
+    setCart: (items) => dispatch({ type: "SET_CART", payload: { items } }),
   };
 
-  return (
-    <CartContext.Provider value={value}>{children}</CartContext.Provider>
-  );
+  return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
 }
 
-/* Hook to Use Cart Context */
 export const useCart = () => {
   const ctx = useContext(CartContext);
-  if (!ctx) {
-    throw new Error("useCart must be used inside <CartProvider />");
-  }
+  if (!ctx) throw new Error("useCart must be used inside <CartProvider />");
   return ctx;
 };
+
 export default CartContext;

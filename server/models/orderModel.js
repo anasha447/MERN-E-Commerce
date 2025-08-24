@@ -7,6 +7,11 @@ const orderSchema = new mongoose.Schema(
       required: true,
       ref: "User",
     },
+    trackingId: {
+      type: String,
+      required: true,
+      unique: true,
+    },
     orderItems: [
       {
         name: { type: String, required: true },
@@ -21,6 +26,9 @@ const orderSchema = new mongoose.Schema(
       },
     ],
     shippingAddress: {
+      name: { type: String, required: true },
+      email: { type: String, required: true },
+      phone: { type: String, required: true },
       address: { type: String, required: true },
       city: { type: String, required: true },
       postalCode: { type: String, required: true },
@@ -35,6 +43,23 @@ const orderSchema = new mongoose.Schema(
       status: { type: String },
       update_time: { type: String },
       email_address: { type: String },
+      razorpay_order_id: { type: String },
+    },
+    status: {
+      type: String,
+      required: true,
+      enum: [
+        "Pending",
+        "Confirmed",
+        "Paid",
+        "Dispatched",
+        "Shipped",
+        "In Transit",
+        "Delivered",
+        "Returned",
+        "Cancelled",
+      ],
+      default: "Pending",
     },
     itemsPrice: {
       type: Number,

@@ -4,6 +4,8 @@ import { Link } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { FaEdit, FaTrash } from "react-icons/fa";
 
+const API_URL = "http://localhost:5000/api";
+
 const UserListPage = () => {
   const { userInfo } = useContext(AuthContext);
   const [users, setUsers] = useState([]);
@@ -17,7 +19,7 @@ const UserListPage = () => {
             Authorization: `Bearer ${userInfo.token}`,
           },
         };
-        const { data } = await axios.get("/api/admin/users", config);
+        const { data } = await axios.get(`${API_URL}/admin/users`, config);
         setUsers(data);
         setLoading(false);
       } catch (error) {
@@ -40,7 +42,7 @@ const UserListPage = () => {
             Authorization: `Bearer ${userInfo.token}`,
           },
         };
-        await axios.delete(`/api/admin/users/${id}`, config);
+        await axios.delete(`${API_URL}/admin/users/${id}`, config);
         setUsers(users.filter((user) => user._id !== id));
       } catch (error) {
         console.error(error);
@@ -68,34 +70,35 @@ const UserListPage = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {users.map((user) => (
-                <tr key={user._id} className="hover:bg-gray-50">
-                  <td className="py-4 px-6">{user._id}</td>
-                  <td className="py-4 px-6">{user.name}</td>
-                  <td className="py-4 px-6">{user.email}</td>
-                  <td className="py-4 px-6">
-                    {user.isAdmin ? (
-                      <span className="text-green-500 font-bold">Yes</span>
-                    ) : (
-                      <span className="text-red-500 font-bold">No</span>
-                    )}
-                  </td>
-                  <td className="py-4 px-6 flex items-center gap-4">
-                    <Link
-                      to={`/admin/user/${user._id}/edit`}
-                      className="text-[var(--color-green)] hover:text-[var(--color-lightgreen)]"
-                    >
-                      <FaEdit size={20} />
-                    </Link>
-                    <button
-                      onClick={() => deleteHandler(user._id)}
-                      className="text-[var(--color-orange)] hover:text-red-700"
-                    >
-                      <FaTrash size={20} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {Array.isArray(users) &&
+                users.map((user) => (
+                  <tr key={user._id} className="hover:bg-gray-50">
+                    <td className="py-4 px-6">{user._id}</td>
+                    <td className="py-4 px-6">{user.name}</td>
+                    <td className="py-4 px-6">{user.email}</td>
+                    <td className="py-4 px-6">
+                      {user.isAdmin ? (
+                        <span className="text-green-500 font-bold">Yes</span>
+                      ) : (
+                        <span className="text-red-500 font-bold">No</span>
+                      )}
+                    </td>
+                    <td className="py-4 px-6 flex items-center gap-4">
+                      <Link
+                        to={`/admin/user/${user._id}/edit`}
+                        className="text-[var(--color-green)] hover:text-[var(--color-lightgreen)]"
+                      >
+                        <FaEdit size={20} />
+                      </Link>
+                      <button
+                        onClick={() => deleteHandler(user._id)}
+                        className="text-[var(--color-orange)] hover:text-red-700"
+                      >
+                        <FaTrash size={20} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>

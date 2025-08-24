@@ -80,7 +80,9 @@ const deleteUser = async (req, res) => {
 };
 
 const getOrders = async (req, res) => {
-  const orders = await Order.find({}).populate("user", "id name");
+  const orders = await Order.find({})
+    .populate("user", "id name")
+    .populate("orderItems.product", "name");
   res.json(orders);
 };
 

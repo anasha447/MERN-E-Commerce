@@ -1,18 +1,21 @@
 import React, { useState, useEffect, useContext } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 import { FaEdit, FaTrash, FaPlus } from "react-icons/fa";
 
+const API_URL = "http://localhost:5000/api";
+
 const ProductListPage = () => {
   const { userInfo } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const { data } = await axios.get("/api/products");
+        const { data } = await axios.get(`${API_URL}/products`);
         setProducts(data);
         setLoading(false);
       } catch (error) {
@@ -31,25 +34,8 @@ const ProductListPage = () => {
             Authorization: `Bearer ${userInfo.token}`,
           },
         };
-        await axios.delete(`/api/products/${id}`, config);
+        await axios.delete(`${API_URL}/products/${id}`, config);
         setProducts(products.filter((product) => product._id !== id));
-      } catch (error) {
-        console.error(error);
-      }
-    }
-  };
-
-  const createProductHandler = async () => {
-    if (window.confirm("Are you sure you want to create a new product?")) {
-      try {
-        const config = {
-          headers: {
-            Authorization: `Bearer ${userInfo.token}`,
-          },
-        };
-        const { data } = await axios.post("/api/products", {}, config);
-        // TODO: Redirect to edit page for the new product
-        console.log(data);
       } catch (error) {
         console.error(error);
       }
@@ -62,12 +48,12 @@ const ProductListPage = () => {
         <h1 className="text-4xl font-bold text-[var(--color-darkgreen)] font-heading">
           Product Management
         </h1>
-        <button
-          onClick={createProductHandler}
+        <Link
+          to="/admin/product/create"
           className="bg-[var(--color-orange)] text-white py-2 px-4 rounded-full flex items-center gap-2 hover:opacity-90"
         >
           <FaPlus /> Create Product
-        </button>
+        </Link>
       </div>
       {loading ? (
         <div>Loading...</div>
@@ -85,29 +71,30 @@ const ProductListPage = () => {
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
-              {products.map((product) => (
-                <tr key={product._id} className="hover:bg-gray-50">
-                  <td className="py-4 px-6">{product._id}</td>
-                  <td className="py-4 px-6">{product.name}</td>
-                  <td className="py-4 px-6">${product.price.toFixed(2)}</td>
-                  <td className="py-4 px-6">{product.category}</td>
-                  <td className="py-4 px-6">{product.brand}</td>
-                  <td className="py-4 px-6 flex items-center gap-4">
-                    <Link
-                      to={`/admin/product/${product._id}/edit`}
-                      className="text-[var(--color-green)] hover:text-[var(--color-lightgreen)]"
-                    >
-                      <FaEdit size={20} />
-                    </Link>
-                    <button
-                      onClick={() => deleteHandler(product._id)}
-                      className="text-[var(--color-orange)] hover:text-red-700"
-                    >
-                      <FaTrash size={20} />
-                    </button>
-                  </td>
-                </tr>
-              ))}
+              {Array.isArray(products) &&
+                products.map((product) => (
+                  <tr key={product._id} className="hover:bg-gray-50">
+                    <td className="py-4 px-6">{product._id}</td>
+                    <td className="py-4 px-6">{product.name}</td>
+                    <td className="py-4 px-6">${product.price.toFixed(2)}</td>
+                    <td className="py-4 px-6">{product.category}</td>
+                    <td className="py-4 px-6">{product.brand}</td>
+                    <td className="py-4 px-6 flex items-center gap-4">
+                      <Link
+                        to={`/admin/product/${product._id}/edit`}
+                        className="text-[var(--color-green)] hover:text-[var(--color-lightgreen)]"
+                      >
+                        <FaEdit size={20} />
+                      </Link>
+                      <button
+                        onClick={() => deleteHandler(product._id)}
+                        className="text-[var(--color-orange)] hover:text-red-700"
+                      >
+                        <FaTrash size={20} />
+                      </button>
+                    </td>
+                  </tr>
+                ))}
             </tbody>
           </table>
         </div>

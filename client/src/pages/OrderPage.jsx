@@ -1,34 +1,69 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import { AuthContext } from "../context/AuthContext";
+import { toast } from "react-toastify";
+
+const API_URL = "http://localhost:5000/api";
 
 const OrderPage = () => {
   const { id: orderId } = useParams();
   const { userInfo } = useContext(AuthContext);
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [status, setStatus] = useState("");
 
-  useEffect(() => {
-    const fetchOrder = async () => {
-      try {
-        const config = {
-          headers: {
-            Authorization: `Bearer ${userInfo.token}`,
-          },
-        };
-        const { data } = await axios.get(`/api/orders/${orderId}`, config);
-        setOrder(data);
-        setLoading(false);
-      } catch (error) {
-        console.error(error);
-        setLoading(false);
-      }
-    };
-    if (userInfo) {
-      fetchOrder();
+  const fetchOrder = useCallback(async () => {
+    if (!userInfo) {
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    try {
+      const config = {
+        headers: {
+          Authorization: `Bearer ${userInfo.token}`,
+        },
+      };
+      const { data } = await axios.get(
+        `${API_URL}/orders/${orderId}`,
+        config
+      );
+      setOrder(data);
+      setStatus(data.status);
+    } catch (error) {
+      console.error(error);
+      toast.error("Failed to fetch order details.");
+    } finally {
+      setLoading(false);
     }
   }, [orderId, userInfo]);
+
+  useEffect(() => {
+    fetchOrder();
+  }, [fetchOrder]);
+
+  const handleStatusUpdate = async () => {
+    try {
+      const config = {
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${userInfo.token}`,
+        },
+      };
+      await axios.put(
+        `${API_URL}/orders/${orderId}/status`,
+        { status },
+        config
+      );
+      toast.success("Order status updated successfully!");
+      fetchOrder(); // Refresh order data
+    } catch (error) {
+      const message =
+        error.response?.data?.message || "Failed to update order status.";
+      toast.error(message);
+    }
+  };
 
   return loading ? (
     <div>Loading...</div>
@@ -81,7 +116,10 @@ const OrderPage = () => {
           <div className="bg-white shadow-md rounded-lg p-8 mt-8">
             <h2 className="text-2xl font-bold mb-4">Order Items</h2>
             {order.orderItems.map((item, index) => (
-              <div key={index} className="flex justify-between items-center mb-4">
+              <div
+                key={index}
+                className="flex justify-between items-center mb-4"
+              >
                 <div className="flex items-center">
                   <img
                     src={item.image}
@@ -118,6 +156,32 @@ const OrderPage = () => {
               <span>Total</span>
               <span>${order.totalPrice}</span>
             </div>
+            {userInfo && userInfo.isAdmin && (
+              <div className="mt-8">
+                <h3 className="text-xl font-bold mb-4">Update Status</h3>
+                <select
+                  value={status}
+                  onChange={(e) => setStatus(e.target.value)}
+                  className="w-full p-2 border rounded-md"
+                >
+                  <option value="Pending">Pending</option>
+                  <option value="Confirmed">Confirmed</option>
+                  <option value="Paid">Paid</option>
+                  <option value="Dispatched">Dispatched</option>
+                  <option value="Shipped">Shipped</option>
+                  <option value="In Transit">In Transit</option>
+                  <option value="Delivered">Delivered</option>
+                  <option value="Cancelled">Cancelled</option>
+                  <option value="Returned">Returned</option>
+                </select>
+                <button
+                  onClick={handleStatusUpdate}
+                  className="w-full mt-4 bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600"
+                >
+                  Update Status
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </div>

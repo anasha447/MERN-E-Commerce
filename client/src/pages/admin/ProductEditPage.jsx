@@ -3,30 +3,70 @@ import axios from "axios";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { AuthContext } from "../../context/AuthContext";
 
+const API_URL = "http://localhost:5000/api";
+
 const ProductEditPage = () => {
   const { id: productId } = useParams();
   const navigate = useNavigate();
   const { userInfo } = useContext(AuthContext);
   const [name, setName] = useState("");
   const [price, setPrice] = useState(0);
-  const [image, setImage] = useState("");
+  const [images, setImages] = useState([""]);
   const [brand, setBrand] = useState("");
   const [category, setCategory] = useState("");
   const [countInStock, setCountInStock] = useState(0);
   const [description, setDescription] = useState("");
+  const [variants, setVariants] = useState([{ name: "", price: 0, stock: 0 }]);
   const [loading, setLoading] = useState(true);
+
+  const handleImageChange = (index, value) => {
+    const newImages = [...images];
+    newImages[index] = value;
+    setImages(newImages);
+  };
+
+  const addImageInput = () => {
+    if (images.length < 5) {
+      setImages([...images, ""]);
+    }
+  };
+
+  const removeImageInput = (index) => {
+    if (images.length > 1) {
+      const newImages = images.filter((_, i) => i !== index);
+      setImages(newImages);
+    }
+  };
+
+  const handleVariantChange = (index, field, value) => {
+    const newVariants = [...variants];
+    newVariants[index][field] = value;
+    setVariants(newVariants);
+  };
+
+  const addVariant = () => {
+    setVariants([...variants, { name: "", price: 0, stock: 0 }]);
+  };
+
+  const removeVariant = (index) => {
+    if (variants.length > 1) {
+      const newVariants = variants.filter((_, i) => i !== index);
+      setVariants(newVariants);
+    }
+  };
 
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const { data } = await axios.get(`/api/products/${productId}`);
+        const { data } = await axios.get(`${API_URL}/products/${productId}`);
         setName(data.name);
         setPrice(data.price);
-        setImage(data.image);
+        setImages(data.images && data.images.length > 0 ? data.images : [""]);
         setBrand(data.brand);
         setCategory(data.category);
         setCountInStock(data.countInStock);
         setDescription(data.description);
+        setVariants(data.variants && data.variants.length > 0 ? data.variants : [{ name: "", price: 0, stock: 0 }]);
         setLoading(false);
       } catch (error) {
         console.error(error);
@@ -46,15 +86,16 @@ const ProductEditPage = () => {
         },
       };
       await axios.put(
-        `/api/products/${productId}`,
+        `${API_URL}/products/${productId}`,
         {
           name,
           price,
-          image,
+          images: images.filter(img => img),
           brand,
           category,
           countInStock,
           description,
+          variants: variants.filter(v => v.name),
         },
         config
       );
@@ -113,20 +154,38 @@ const ProductEditPage = () => {
               />
             </div>
             <div className="mb-6">
-              <label
-                className="block text-[var(--color-darkgreen)] text-lg font-bold mb-2 font-heading"
-                htmlFor="image"
-              >
-                Image
+              <label className="block text-[var(--color-darkgreen)] text-lg font-bold mb-2 font-heading">
+                Image URLs (up to 5)
               </label>
-              <input
-                className="shadow-sm appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                id="image"
-                type="text"
-                placeholder="Enter image URL"
-                value={image}
-                onChange={(e) => setImage(e.target.value)}
-              />
+              {images.map((img, index) => (
+                <div key={index} className="flex items-center mb-2">
+                  <input
+                    className="shadow-sm appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                    type="text"
+                    placeholder={`Image URL ${index + 1}`}
+                    value={img}
+                    onChange={(e) => handleImageChange(index, e.target.value)}
+                  />
+                  {images.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeImageInput(index)}
+                      className="ml-2 text-red-500 hover:text-red-700"
+                    >
+                      Remove
+                    </button>
+                  )}
+                </div>
+              ))}
+              {images.length < 5 && (
+                <button
+                  type="button"
+                  onClick={addImageInput}
+                  className="mt-2 text-sm text-[var(--color-orange)] hover:underline"
+                >
+                  + Add Another Image
+                </button>
+              )}
             </div>
             <div className="mb-6">
               <label
@@ -161,11 +220,29 @@ const ProductEditPage = () => {
               />
             </div>
             <div className="mb-6">
+              <label className="block text-[var(--color-darkgreen)] text-lg font-bold mb-2 font-heading">
+                Variants
+              </label>
+              {variants.map((variant, index) => (
+                <div key={index} className="grid grid-cols-4 gap-2 mb-2 p-2 border rounded">
+                  <input type="text" placeholder="Name (e.g., 250g)" value={variant.name} onChange={e => handleVariantChange(index, 'name', e.target.value)} className="col-span-2 shadow-sm border rounded w-full py-2 px-3"/>
+                  <input type="number" placeholder="Price" value={variant.price} onChange={e => handleVariantChange(index, 'price', e.target.value)} className="shadow-sm border rounded w-full py-2 px-3"/>
+                  <div className="flex items-center">
+                    <input type="number" placeholder="Stock" value={variant.stock} onChange={e => handleVariantChange(index, 'stock', e.target.value)} className="shadow-sm border rounded w-full py-2 px-3"/>
+                    {variants.length > 1 && <button type="button" onClick={() => removeVariant(index)} className="ml-2 text-red-500">X</button>}
+                  </div>
+                </div>
+              ))}
+              <button type="button" onClick={addVariant} className="mt-2 text-sm text-[var(--color-orange)] hover:underline">
+                + Add Variant
+              </button>
+            </div>
+            <div className="mb-6">
               <label
                 className="block text-[var(--color-darkgreen)] text-lg font-bold mb-2 font-heading"
                 htmlFor="countInStock"
               >
-                Count In Stock
+                Default Count In Stock
               </label>
               <input
                 className="shadow-sm appearance-none border rounded w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"

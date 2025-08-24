@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { MdShoppingCart } from "react-icons/md";
 import { FaUserCircle } from "react-icons/fa";
 import { Link, NavLink } from "react-router-dom";
@@ -9,12 +9,45 @@ import { AuthContext } from "../context/AuthContext";
 
 const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
-  const { itemCount } = useCart();
-  const { userInfo, logout } = useContext(AuthContext);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isAdminMenuOpen, setIsAdminMenuOpen] = useState(false);
+  const userMenuTimeout = useRef(null);
+  const adminMenuTimeout = useRef(null);
+
+  const { itemCount, clearCart, openCart } = useCart();
+  const { userInfo, logout: authLogout } = useContext(AuthContext);
+
+  const handleLogout = () => {
+    authLogout();
+    clearCart();
+  };
 
   const getGravatarURL = (email) => {
+    if (!email) return "";
     const hash = md5(email.trim().toLowerCase());
-    return `https://www.gravatar.com/avatar/${hash}?d=identicon`;
+    return `https://www.gravatar.com/avatar/${hash}?d=mp`;
+  };
+
+  const handleUserMenuEnter = () => {
+    clearTimeout(userMenuTimeout.current);
+    setIsUserMenuOpen(true);
+  };
+
+  const handleUserMenuLeave = () => {
+    userMenuTimeout.current = setTimeout(() => {
+      setIsUserMenuOpen(false);
+    }, 1000);
+  };
+
+  const handleAdminMenuEnter = () => {
+    clearTimeout(adminMenuTimeout.current);
+    setIsAdminMenuOpen(true);
+  };
+
+  const handleAdminMenuLeave = () => {
+    adminMenuTimeout.current = setTimeout(() => {
+      setIsAdminMenuOpen(false);
+    }, 1000);
   };
 
   useEffect(() => {
@@ -22,7 +55,11 @@ const Header = () => {
       setIsScrolled(window.scrollY > 8);
     };
     window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+      clearTimeout(userMenuTimeout.current);
+      clearTimeout(adminMenuTimeout.current);
+    };
   }, []);
 
   return (
@@ -57,18 +94,22 @@ const Header = () => {
             </ul>
           </nav>
 
-          <div className="justify-self-center relative group">
+          <div className="justify-self-center relative">
             <Link to="/" aria-label="Matessa home">
               <img
                 src={logo}
                 alt="Matessa Logo"
-                className="h-20 md:h-23 object-contain transition-transform duration-500 group-hover:scale-105 group-hover:animate-pulse-glow"
+                className="h-20 md:h-23 object-contain transition-transform duration-500 hover:scale-105"
               />
             </Link>
           </div>
 
           <div className="justify-self-end flex items-center gap-4">
-            <Link to="/cart" aria-label="Cart" className="relative group">
+            <button
+              onClick={openCart}
+              aria-label="Cart"
+              className="relative"
+            >
               <MdShoppingCart
                 size={26}
                 className="text-[#E9DDAF] hover:text-[#E85D1F] transition-colors duration-300"
@@ -78,92 +119,122 @@ const Header = () => {
                   {itemCount}
                 </span>
               )}
-            </Link>
-            {userInfo && userInfo.isAdmin && (
-              <div className="relative group">
+            </button>
+
+            {userInfo && userInfo.isAdmin ? (
+              <div
+                className="relative"
+                onMouseEnter={handleAdminMenuEnter}
+                onMouseLeave={handleAdminMenuLeave}
+              >
                 <button className="text-[#E9DDAF] hover:text-[#E85D1F] transition-colors font-bold">
                   Admin
                 </button>
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 hidden group-hover:block">
-                  <Link
-                    to="/admin/dashboard"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Dashboard
-                  </Link>
-                  <Link
-                    to="/admin/users"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Users
-                  </Link>
-                  <Link
-                    to="/admin/orders"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Orders
-                  </Link>
-                  <Link
-                    to="/admin/products"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Products
-                  </Link>
-                </div>
-              </div>
-            )}
-            {userInfo ? (
-              <div className="relative group">
-                <button className="text-[#E9DDAF] hover:text-[#E85D1F] transition-colors">
-                  <img
-                    src={getGravatarURL(userInfo.email)}
-                    alt={userInfo.name}
-                    className="w-8 h-8 rounded-full"
-                  />
-                </button>
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 hidden group-hover:block">
-                  <div className="px-4 py-2 text-sm text-gray-700 border-b">
-                    Signed in as <strong>{userInfo.name}</strong>
+                {isAdminMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-[var(--color-craemy)] rounded-md shadow-lg py-1 z-50">
+                    <Link
+                      to="/admin/dashboard"
+                      className="block px-4 py-2 text-sm text-white hover:bg-[var(--color-lightgreen)]"
+                    >
+                      Dashboard
+                    </Link>
+                    <Link
+                      to="/admin/users"
+                      className="block px-4 py-2 text-sm text-white hover:bg-[var(--color-lightgreen)]"
+                    >
+                      Users
+                    </Link>
+                    <Link
+                      to="/admin/orders"
+                      className="block px-4 py-2 text-sm text-white hover:bg-[var(--color-lightgreen)]"
+                    >
+                      Orders
+                    </Link>
+                    <Link
+                      to="/admin/products"
+                      className="block px-4 py-2 text-sm text-white hover:bg-[var(--color-lightgreen)]"
+                    >
+                      Products
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-[var(--color-lightgreen)]"
+                    >
+                      Logout
+                    </button>
                   </div>
-                  <Link
-                    to="/profile"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Profile
-                  </Link>
-                  <Link
-                    to="/myorders"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    My Orders
-                  </Link>
-                  <button
-                    onClick={logout}
-                    className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Logout
-                  </button>
-                </div>
+                )}
               </div>
             ) : (
-              <div className="relative group">
+              <div
+                className="relative"
+                onMouseEnter={handleUserMenuEnter}
+                onMouseLeave={handleUserMenuLeave}
+              >
                 <button className="text-[#E9DDAF] hover:text-[#E85D1F] transition-colors">
-                  <FaUserCircle size={26} />
+                  {userInfo ? (
+                    <img
+                      src={getGravatarURL(userInfo.email)}
+                      alt={userInfo.name}
+                      className="w-8 h-8 rounded-full"
+                    />
+                  ) : (
+                    <FaUserCircle size={26} />
+                  )}
                 </button>
-                <div className="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-1 z-50 hidden group-hover:block">
-                  <Link
-                    to="/login"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    to="/register"
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                  >
-                    Register
-                  </Link>
-                </div>
+                {isUserMenuOpen &&
+                  (userInfo ? (
+                    <div className="absolute right-0 mt-2 w-48 bg-[var(--color-craemy)] rounded-md shadow-lg py-1 z-50">
+                      <div className="px-4 py-2 text-sm text-white border-b border-white/20">
+                        Signed in as <strong>{userInfo.name}</strong>
+                      </div>
+                      <Link
+                        to="/profile"
+                        className="block px-4 py-2 text-sm text-white hover:bg-[var(--color-lightgreen)]"
+                      >
+                        Profile
+                      </Link>
+                      <Link
+                        to="/myorders"
+                        className="block px-4 py-2 text-sm text-white hover:bg-[var(--color-lightgreen)]"
+                      >
+                        My Orders
+                      </Link>
+                      <Link
+                        to="/track-order"
+                        className="block px-4 py-2 text-sm text-white hover:bg-[var(--color-lightgreen)]"
+                      >
+                        Track Order
+                      </Link>
+                      <button
+                        onClick={handleLogout}
+                        className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-[var(--color-lightgreen)]"
+                      >
+                        Logout
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="absolute right-0 mt-2 w-48 bg-[var(--color-craemy)] rounded-md shadow-lg py-1 z-50">
+                      <Link
+                        to="/login"
+                        className="block px-4 py-2 text-sm text-white hover:bg-[var(--color-lightgreen)]"
+                      >
+                        Login
+                      </Link>
+                      <Link
+                        to="/register"
+                        className="block px-4 py-2 text-sm text-white hover:bg-[var(--color-lightgreen)]"
+                      >
+                        Register
+                      </Link>
+                      <Link
+                        to="/track-order"
+                        className="block px-4 py-2 text-sm text-white hover:bg-[var(--color-lightgreen)]"
+                      >
+                        Track Order
+                      </Link>
+                    </div>
+                  ))}
               </div>
             )}
           </div>

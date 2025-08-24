@@ -19,6 +19,29 @@ export const getProducts = async () => {
   }
 };
 
+// Create a product review
+export const createProductReview = async (productId, review, token) => {
+  try {
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+    const { data } = await api.post(
+      `/products/${productId}/reviews`,
+      review,
+      config
+    );
+    return data;
+  } catch (error) {
+    console.error(
+      `❌ Error creating review for product ${productId}:`,
+      error.response?.data?.message || error.message
+    );
+    throw error;
+  }
+};
+
 // Get single product
 export const getProductById = async (id) => {
   try {
