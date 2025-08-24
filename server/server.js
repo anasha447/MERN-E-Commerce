@@ -19,7 +19,7 @@ app.use(express.json());
 
 // Serve static files
 const __dirname = path.resolve();
-app.use("/public", express.static(path.join(__dirname, "/client/public")));
+app.use("/images", express.static(path.join(__dirname, "server/images")));
 
 
 // Routes
