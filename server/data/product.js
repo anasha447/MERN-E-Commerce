@@ -2,7 +2,7 @@
 const products = [
   {
     name: "Yerba Mate Masala",
-    image: "/images/masala.png",
+    images: ["/images/masala.png"],
     description: "Rich and spicy yerba mate blend.",
     brand: "Matessa",
     category: "Mate",
@@ -13,7 +13,7 @@ const products = [
   },
   {
     name: "Yerba Mate Ginger-Lemon",
-    image: "/images/lemon.png",
+    images: ["/images/lemon.png"],
     description: "Refreshing ginger and lemon infusion.",
     brand: "Matessa",
     category: "Mate",
@@ -24,7 +24,7 @@ const products = [
   },
   {
     name: "Yerba Mate Tulsi-Mint",
-    image: "/images/tulsi.png",
+    images: ["/images/tulsi.png"],
     description: "Cooling mint and tulsi herbal mix.",
     brand: "Matessa",
     category: "Mate",
@@ -35,7 +35,7 @@ const products = [
   },
   {
     name: "Berry Bliss Mate",
-    image: "/images/berry.png",
+    images: ["/images/berry.png"],
     description: "Fruity berry flavors with energizing mate.",
     brand: "Matessa",
     category: "Mate",
@@ -44,7 +44,7 @@ const products = [
   },
   {
     name: "Mint Breeze Mate",
-    image: "/images/mint.png",
+    images: ["/images/mint.png"],
     description: "Fresh mint leaves blended with yerba mate.",
     brand: "Matessa",
     category: "Mate",
@@ -53,7 +53,7 @@ const products = [
   },
   {
     name: "Chai Spice Mate",
-    image: "/images/chai.png",
+    images: ["/images/chai.png"],
     description: "Aromatic chai spices with a mate twist.",
     brand: "Matessa",
     category: "Mate",
@@ -62,7 +62,7 @@ const products = [
   },
   {
     name: "Citrus Zest Mate",
-    image: "/images/citrus.png",
+    images: ["/images/citrus.png"],
     description: "Citrusy tang with smooth yerba mate.",
     brand: "Matessa",
     category: "Mate",
@@ -71,7 +71,7 @@ const products = [
   },
   {
     name: "Mate Cup Accessory",
-    image: "/images/matecup.png",
+    images: ["/images/matecup.png"],
     description: "Traditional mate gourd cup with straw.",
     brand: "Matessa",
     category: "Accessories",
