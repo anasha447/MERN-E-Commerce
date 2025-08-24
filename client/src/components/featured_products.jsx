@@ -23,15 +23,12 @@ const FeaturedProducts = () => {
   }, []);
 
   const handleAddToCart = (product) => {
-    addToCart(
-      {
-        id: product._id,
-        name: product.name,
-        price: product.price,
- fix-product-image-fetching
-        image: getImageUrl(product.images[0]) || "",
-
-    );
+    addToCart({
+      id: product._id,
+      name: product.name,
+      price: product.price,
+      image: getImageUrl(product.images?.[0]) || "",
+    });
   };
 
   const goToPrevious = () => {
@@ -49,7 +46,6 @@ const FeaturedProducts = () => {
   const getVisibleProducts = () => {
     if (products.length === 0) return [];
     const visible = [];
-    // This logic ensures we can show up to 3 products, and handles looping.
     for (let i = 0; i < Math.min(3, products.length); i++) {
       visible.push(products[(currentIndex + i) % products.length]);
     }
@@ -75,7 +71,7 @@ const FeaturedProducts = () => {
         <h2 className="text-3xl font-bold mb-10">🌟 Featured Products</h2>
         <div className="relative">
           <div className="flex overflow-hidden justify-center items-center space-x-8">
-            {/* Arrow Buttons */}
+            {/* Left Arrow */}
             <button
               onClick={goToPrevious}
               className="flex-shrink-0 bg-white/80 p-2 rounded-full shadow-md hover:bg-white z-10"
@@ -85,7 +81,7 @@ const FeaturedProducts = () => {
 
             {getVisibleProducts().map((product, index) => (
               <div
-                key={`${product._id}-${currentIndex}-${index}`} // More stable key
+                key={`${product._id}-${currentIndex}-${index}`}
                 className="bg-white rounded-xl overflow-hidden shadow-lg hover:shadow-2xl transition-all duration-300 w-full max-w-xs"
               >
                 <div
@@ -93,7 +89,7 @@ const FeaturedProducts = () => {
                   onClick={() => navigate(`/product/${product._id}`)}
                 >
                   <img
-                    src={getImageUrl(product.images[0])}
+                    src={getImageUrl(product.images?.[0])}
                     alt={product.name}
                     className="w-full h-64 object-cover transition-transform duration-500 group-hover:scale-110"
                   />
@@ -123,6 +119,7 @@ const FeaturedProducts = () => {
               </div>
             ))}
 
+            {/* Right Arrow */}
             <button
               onClick={goToNext}
               className="flex-shrink-0 bg-white/80 p-2 rounded-full shadow-md hover:bg-white z-10"

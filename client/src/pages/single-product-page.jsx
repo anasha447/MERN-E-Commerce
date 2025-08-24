@@ -63,9 +63,7 @@ const SingleProductPage = () => {
     const itemToAdd = {
       id: product._id,
       name: product.name,
- fix-product-image-fetching
-      image: getImageUrl(product.images[0]) || "", // Use the first image for cart
-
+      image: getImageUrl(product.images?.[0]) || "", // ✅ Safe fetch
       price: selectedVariant ? selectedVariant.price : product.price,
       variant: selectedVariant ? selectedVariant.name : null,
     };
@@ -73,7 +71,7 @@ const SingleProductPage = () => {
   };
 
   const handleBuyNow = () => {
-    handleAddToCart(false); // Add to cart without opening the drawer
+    handleAddToCart(false);
     navigate("/checkoutpage");
   };
 
@@ -92,7 +90,7 @@ const SingleProductPage = () => {
       toast.success("Review submitted successfully!");
       setRating(0);
       setComment("");
-      fetchProduct(); // Refresh product to show new review
+      fetchProduct();
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to submit review.");
     }
@@ -112,6 +110,7 @@ const SingleProductPage = () => {
     <div className="py-12 px-4 md:px-12">
       <div className="container mx-auto">
         <div className="flex flex-col md:flex-row items-start">
+          {/* Left Side - Product Images */}
           <div className="w-full md:w-1/2 flex flex-col items-center">
             {mainImage && (
               <>
@@ -142,6 +141,7 @@ const SingleProductPage = () => {
             )}
           </div>
 
+          {/* Right Side - Product Info */}
           <div className="w-full md:w-1/2 mt-10 md:mt-0 md:pl-12">
             <h1 className="text-4xl font-bold [color:var(--color-darkgreen)]">
               {product.name}
@@ -198,6 +198,7 @@ const SingleProductPage = () => {
           </div>
         </div>
 
+        {/* Reviews Section */}
         <div className="mt-16 border-t pt-12">
           <h2 className="text-3xl font-bold mb-6">Reviews</h2>
           {product.reviews.length === 0 && <p>No reviews yet.</p>}
@@ -217,6 +218,7 @@ const SingleProductPage = () => {
           </div>
         </div>
 
+        {/* Review Form */}
         <div className="mt-12">
           <h2 className="text-3xl font-bold mb-6">Write a Customer Review</h2>
           {userInfo ? (
